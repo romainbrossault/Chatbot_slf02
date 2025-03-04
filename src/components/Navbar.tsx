@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { BrainCircuit, Home, MessageSquare, ChevronDown, User, Shield, BookOpen } from 'lucide-react';
 import '../styles/Navbar.css';
 
+import logo from '../img/logo02.svg';
+
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -16,7 +18,7 @@ const Navbar: React.FC = () => {
         <div className="navbar-content">
           <div className="navbar-left">
             <Link to="/" className="navbar-logo">
-              <BrainCircuit className="logo-icon" />
+              <img src={logo} alt="Logo" className="logo-icon" />
               <span className="logo-text">ChatBot</span>
             </Link>
             <div className="navbar-links">
