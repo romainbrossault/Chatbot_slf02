@@ -43,9 +43,9 @@ const Home: React.FC = () => {
         {messages.length === 0 ? (
           <div className="welcome-container">
             <div className="welcome-content">
-              <h1 className="welcome-title">ChatGPT Clone</h1>
+              <h1 className="welcome-title">CHATBOT</h1>
               <p className="welcome-text">
-                Bienvenue sur notre clone de ChatGPT. Posez une question pour commencer une conversation.
+                Bienvenue sur le ChatBot. Posez une question pour commencer une conversation.
               </p>
             </div>
           </div>

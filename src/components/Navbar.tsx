@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
           <div className="navbar-left">
             <Link to="/" className="navbar-logo">
               <BrainCircuit className="logo-icon" />
-              <span className="logo-text">ChatGPT Clone</span>
+              <span className="logo-text">ChatBot</span>
             </Link>
             <div className="navbar-links">
               <Link to="/" className="navbar-link">
