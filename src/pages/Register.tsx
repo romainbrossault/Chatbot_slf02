@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import '../styles/Register.css';
 
@@ -9,11 +9,42 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log('Registration attempt with:', { firstName, lastName, email, password });
+
+    if (password !== confirmPassword) {
+      console.error('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/utilisateur', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nom: lastName,
+          prenom: firstName,
+          email,
+          password,
+          role: 'User',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Account created successfully:', data);
+        // Redirect to login page
+        navigate('/login');
+      } else {
+        console.error('Account creation failed');
+      }
+    } catch (error) {
+      console.error('Error during account creation:', error);
+    }
   };
 
   return (

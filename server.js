@@ -50,24 +50,23 @@ db.connect((err) => {
                 });
             });
 
-            // Vérifier les informations de connexion de l'utilisateur
-            app.get("/utilisateur", (req, res) => {
-                const { email, password } = req.query;
-                const query = "SELECT * FROM utilisateur WHERE email = ? AND password = ?";
-                db.query(query, [email, password], (err, results) => {
-                    if (err) {
-                        console.error("Erreur SQL:", err);
-                        res.status(500).send("Erreur serveur");
-                        return;
-                    }
-                    if (results.length > 0) {
-                        res.json(results[0]);
-                    } else {
-                        res.status(401).send("Email ou mot de passe incorrect");
-                    }
-                });
-            });
-
+           // Vérifier les informations de connexion de l'utilisateur
+app.get("/utilisateur", (req, res) => {
+    const { email, password } = req.query;
+    const query = "SELECT * FROM utilisateur WHERE email = ? AND password = ?";
+    db.query(query, [email, password], (err, results) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        if (results.length > 0) {
+            res.json(results[0]);
+        } else {
+            res.status(401).send("Email ou mot de passe incorrect");
+        }
+    });
+});
             // Ajouter un utilisateur
             app.post("/utilisateur", (req, res) => {
                 const { nom, prenom, email, password, role } = req.body;
