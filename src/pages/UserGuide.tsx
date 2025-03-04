@@ -21,7 +21,7 @@ const UserGuide: React.FC = () => {
               <li>Accédez à la page d'accueil en cliquant sur "Accueil" dans la barre de navigation.</li>
               <li>Tapez votre question ou message dans la zone de texte en bas de l'écran.</li>
               <li>Appuyez sur le bouton d'envoi ou la touche Entrée pour envoyer votre message.</li>
-              <li>Attendez la réponse de l'assistant IA.</li>
+              <li>Attendez la réponse du ChatBot.</li>
             </ol>
             <p>
               Vous pouvez continuer la conversation en envoyant des messages supplémentaires.
@@ -41,7 +41,7 @@ const UserGuide: React.FC = () => {
             <ol className="guide-list ordered-list">
               <li>Cliquez sur "Menu" dans la barre de navigation, puis sélectionnez "Connexion".</li>
               <li>Si vous n'avez pas encore de compte, cliquez sur "Créer un compte".</li>
-              <li>Remplissez le formulaire avec vos informations personnelles.</li>
+              <li>Remplissez le formulaire avec vos informations.</li>
               <li>Créez un mot de passe sécurisé.</li>
               <li>Cliquez sur "Créer un compte" pour finaliser votre inscription.</li>
             </ol>
@@ -58,11 +58,11 @@ const UserGuide: React.FC = () => {
           </div>
           <div className="section-content">
             <p>
-              Pour obtenir les meilleures réponses de notre assistant IA:
+              Pour obtenir les meilleures réponses du ChatBot, suivez ces conseils utiles:
             </p>
             <ul className="guide-list unordered-list">
               <li>Posez des questions claires et spécifiques.</li>
-              <li>Fournissez suffisamment de contexte pour que l'IA comprenne votre demande.</li>
+              <li>Fournissez suffisamment de contexte pour qu'il comprenne votre demande.</li>
               <li>Pour des sujets complexes, décomposez votre question en plusieurs parties.</li>
               <li>Si la réponse n'est pas satisfaisante, essayez de reformuler votre question.</li>
             </ul>
