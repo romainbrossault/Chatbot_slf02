@@ -9,6 +9,7 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('élève');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,14 +31,13 @@ const Register: React.FC = () => {
           prenom: firstName,
           email,
           password,
-          role: 'User',
+          role,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log('Account created successfully:', data);
-        // Redirect to login page
         navigate('/login');
       } else {
         console.error('Account creation failed');
@@ -136,6 +136,21 @@ const Register: React.FC = () => {
               className="form-input form-input-with-icon"
               placeholder="Confirmer le mot de passe"
             />
+          </div>
+          <div className="input-wrapper">
+            <label htmlFor="role" className="sr-only">
+              Rôle
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="form-input"
+            >
+              <option value="élève">Élève</option>
+              <option value="enseignant">Enseignant</option>
+            </select>
           </div>
 
           <div>
