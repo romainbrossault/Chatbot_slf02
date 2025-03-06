@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import '../styles/Register.css';
+import { UserContext } from '../context/UserContext';
 
 const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -11,6 +12,7 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('élève');
   const navigate = useNavigate();
+  const { login } = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +40,8 @@ const Register: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Account created successfully:', data);
-        navigate('/login');
+        login(data);
+        navigate('/');
       } else {
         console.error('Account creation failed');
       }

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Trash2 } from 'lucide-react';
 import '../styles/Chats.css';
+import { UserContext } from '../context/UserContext';
 
 interface Chat {
   id: number;
@@ -9,7 +11,15 @@ interface Chat {
 }
 
 const Chats: React.FC = () => {
-  // Mock data for chats
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
   const chats: Chat[] = [
     { id: 1, title: 'Comment créer un site web?', date: '2023-05-15' },
     { id: 2, title: 'Qu\'est-ce que React?', date: '2023-05-16' },

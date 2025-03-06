@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Lock } from 'lucide-react';
 import '../styles/Login.css';
+import { UserContext } from '../context/UserContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:5000/utilisateur?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
+      const response = await fetch(`http://localhost:5000/utilisateur/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -22,7 +24,7 @@ const Login: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data);
-        // Redirect to home page or dashboard
+        login(data);
         navigate('/');
       } else {
         console.error('Login failed');

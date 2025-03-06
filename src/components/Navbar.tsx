@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { BrainCircuit, Home, MessageSquare, ChevronDown, User, Shield, BookOpen } from 'lucide-react';
+import { Home, MessageSquare, ChevronDown, User, BookOpen, LogOut } from 'lucide-react';
 import '../styles/Navbar.css';
+import { UserContext } from '../context/UserContext';
 
 import logo from '../img/logo02.svg';
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, logout } = useContext(UserContext);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -26,10 +28,12 @@ const Navbar: React.FC = () => {
                 <Home className="link-icon" />
                 Accueil
               </Link>
-              <Link to="/chats" className="navbar-link">
-                <MessageSquare className="link-icon" />
-                Mes Conversations
-              </Link>
+              {user && (
+                <Link to="/chats" className="navbar-link">
+                  <MessageSquare className="link-icon" />
+                  Mes Conversations
+                </Link>
+              )}
             </div>
           </div>
           <div className="dropdown">
@@ -43,22 +47,47 @@ const Navbar: React.FC = () => {
             </button>
             {isDropdownOpen && (
               <div className="dropdown-menu">
-                <Link
-                  to="/login"
-                  className="dropdown-item"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  <User className="dropdown-item-icon" />
-                  Connexion
-                </Link>
-                <Link
-                  to="/admin"
-                  className="dropdown-item"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  <Shield className="dropdown-item-icon" />
-                  Administration
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to="/account"
+                      className="dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User className="dropdown-item-icon" />
+                      Mon Compte
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="dropdown-item"
+                    >
+                      <LogOut className="dropdown-item-icon" />
+                      Se déconnecter
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User className="dropdown-item-icon" />
+                      Connexion
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User className="dropdown-item-icon" />
+                      Créer un compte
+                    </Link>
+                  </>
+                )}
                 <Link
                   to="/guide"
                   className="dropdown-item"
