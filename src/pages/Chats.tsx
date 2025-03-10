@@ -21,9 +21,9 @@ const Chats: React.FC = () => {
   }, [user, navigate]);
 
   const chats: Chat[] = [
-    { id: 1, title: 'Comment créer un site web?', date: '2023-05-15' },
-    { id: 2, title: 'Qu\'est-ce que React?', date: '2023-05-16' },
-    { id: 3, title: 'Comment utiliser Tailwind CSS?', date: '2023-05-17' },
+    { id: 1, title: 'Chat #1', date: '2023-05-15' },
+    { id: 2, title: 'Chat #2', date: '2023-05-16' },
+    { id: 3, title: 'Chat #3', date: '2023-05-17' },
   ];
 
   return (
