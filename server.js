@@ -2,16 +2,15 @@ import express from "express";
 import mysql from "mysql2";
 import dotenv from "dotenv";
 import cors from "cors";
+import nlp from "compromise";
 
 dotenv.config();
 const app = express();
 const PORT = 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Connexion à MySQL
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -27,12 +26,11 @@ db.connect((err) => {
     console.log("✅ Connecté à MySQL");
 });
 
-// Route principale
 app.get("/", (req, res) => {
     res.send("Serveur Express opérationnel !");
 });
 
-// Récupérer tous les utilisateurs
+// Gestion des utilisateurs
 app.get("/utilisateur", (req, res) => {
     db.query("SELECT * FROM utilisateur", (err, results) => {
         if (err) {
@@ -44,7 +42,6 @@ app.get("/utilisateur", (req, res) => {
     });
 });
 
-// Vérifier les informations de connexion et retourner l'ID utilisateur
 app.get("/utilisateur/login", (req, res) => {
     const { email, password } = req.query;
     const query = "SELECT id, nom, prenom, email, role FROM utilisateur WHERE email = ? AND password = ?";
@@ -63,7 +60,6 @@ app.get("/utilisateur/login", (req, res) => {
     });
 });
 
-// Ajouter un utilisateur
 app.post("/utilisateur", (req, res) => {
     const { nom, prenom, email, password, role } = req.body;
     const query = "INSERT INTO utilisateur (nom, prenom, email, password, role, date_inscription) VALUES (?, ?, ?, ?, ?, NOW())";
@@ -78,7 +74,83 @@ app.post("/utilisateur", (req, res) => {
     });
 });
 
-// Récupérer les questions
+// Ajouter une question et obtenir une réponse basée sur la base de connaissances
+app.post("/question", (req, res) => {
+    const { utilisateur_id, contenu } = req.body;
+
+    if (!utilisateur_id) {
+        return res.status(400).json({ error: "⚠️ ID utilisateur manquant" });
+    }
+    if (!contenu) {
+        return res.status(400).json({ error: "⚠️ Contenu manquant" });
+    }
+
+    const queryInsertQuestion = "INSERT INTO question (utilisateur_id, contenu, date_question) VALUES (?, ?, NOW())";
+    
+    db.query(queryInsertQuestion, [utilisateur_id, contenu], (err, result) => {
+        if (err) {
+            console.error("❌ Erreur SQL lors de l'ajout de la question:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+
+        const questionId = result.insertId;
+        console.log(`📩 Question ajoutée avec ID ${questionId}`);
+
+        // Analyse NLP pour extraire les mots-clés
+        const doc = nlp(contenu);
+        const keywords = doc.nouns().out('array');
+
+        console.log("🔍 Mots-clés extraits:", keywords);
+
+        if (keywords.length === 0) {
+            return res.status(400).json({ error: "⚠️ Aucun mot-clé trouvé dans la question" });
+        }
+
+        // Rechercher une réponse basée sur les mots-clés trouvés
+        const querySearchKnowledge = "SELECT id, contenu FROM base_connaissance WHERE mot_cle IN (?) LIMIT 1";
+        db.query(querySearchKnowledge, [keywords], (err, knowledgeResults) => {
+            if (err) {
+                console.error("Erreur SQL lors de la recherche dans la base de connaissances:", err);
+                res.status(500).send("Erreur serveur");
+                return;
+            }
+
+            let responseContent;
+            let connaissanceId = null;
+            if (knowledgeResults.length > 0) {
+                responseContent = knowledgeResults[0].contenu;
+                connaissanceId = knowledgeResults[0].id;
+            } else {
+                responseContent = "Je n'ai pas trouvé de réponse à votre question.";
+            }
+
+            console.log("🤖 Réponse générée:", responseContent);
+
+            // Insérer la réponse dans la table "reponse"
+            const queryInsertResponse = "INSERT INTO reponse (question_id, connaissance_id, contenu, source, date_reponse) VALUES (?, ?, ?, 'base_connaissance', NOW())";
+            db.query(queryInsertResponse, [questionId, connaissanceId, responseContent], (err, responseResult) => {
+                if (err) {
+                    console.error("❌ Erreur SQL lors de l'ajout de la réponse:", err);
+                    res.status(500).send("Erreur serveur");
+                    return;
+                }
+
+                console.log(`✅ Réponse ajoutée avec ID ${responseResult.insertId}`);
+
+                res.json({
+                    id: questionId,
+                    utilisateur_id,
+                    contenu,
+                    date_question: new Date(),
+                    reponse: responseContent
+                });
+            });
+        });
+    });
+});
+
+// Récupérer toutes les questions
 app.get("/question", (req, res) => {
     db.query("SELECT * FROM question", (err, results) => {
         if (err) {
@@ -90,32 +162,7 @@ app.get("/question", (req, res) => {
     });
 });
 
- // Ajouter une question
- app.post("/question", (req, res) => {
-    const { utilisateur_id, contenu } = req.body;
-    
-    console.log("📩 Nouvelle question reçue:", req.body); // Debugging
-
-    if (!utilisateur_id) {
-        return res.status(400).json({ error: "⚠️ ID utilisateur manquant" });
-    }
-    if (!contenu) {
-        return res.status(400).json({ error: "⚠️ Contenu manquant" });
-    }
-
-    const query = "INSERT INTO question (utilisateur_id, contenu, date_question) VALUES (?, ?, NOW())";
-    
-    db.query(query, [utilisateur_id, contenu], (err, result) => {
-        if (err) {
-            console.error("❌ Erreur SQL:", err);
-            res.status(500).send("Erreur serveur");
-            return;
-        }
-        res.json({ id: result.insertId, utilisateur_id, contenu, date_question: new Date() });
-    });
-});
-
-// Récupérer les réponses
+// Récupérer toutes les réponses
 app.get("/reponse", (req, res) => {
     db.query("SELECT * FROM reponse", (err, results) => {
         if (err) {
@@ -127,7 +174,7 @@ app.get("/reponse", (req, res) => {
     });
 });
 
-// Ajouter une réponse
+// Ajouter une réponse générée
 app.post("/reponse", (req, res) => {
     const { question_id, contenu, source } = req.body;
     const query = "INSERT INTO reponse (question_id, connaissance_id, contenu, source, date_reponse) VALUES (?, ?, ?, ?, NOW())";
@@ -142,21 +189,32 @@ app.post("/reponse", (req, res) => {
     });
 });
 
-// Analyser un message avec NLP
-app.post("/analyze", async (req, res) => {
-    try {
-        const text = req.body.text;
-        if (!text) return res.status(400).json({ error: "Texte manquant" });
-
-        const result = await nlp(text);
-        res.json(result);
-    } catch (error) {
-        console.error("Erreur NLP:", error);
-        res.status(500).json({ error: "Erreur interne du serveur" });
-    }
+// Gestion de la base de connaissances
+app.get("/base_connaissance", (req, res) => {
+    db.query("SELECT * FROM base_connaissance", (err, results) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json(results);
+    });
 });
 
-// Démarrer le serveur
+app.post("/base_connaissance", (req, res) => {
+    const { mot_cle, contenu } = req.body;
+    const query = "INSERT INTO base_connaissance (mot_cle, contenu, date_mise_a_jour) VALUES (?, ?, NOW())";
+
+    db.query(query, [mot_cle, contenu], (err, result) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json({ id: result.insertId, mot_cle, contenu });
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
 });

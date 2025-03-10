@@ -26,7 +26,6 @@ const Home: React.FC = () => {
     }
     if (input.trim() === '') return;
 
-    // Ajouter le message utilisateur
     const userMessage: Message = {
       id: Date.now(),
       text: input,
@@ -37,28 +36,24 @@ const Home: React.FC = () => {
     setInput('');
 
     try {
+      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: input });
+
       const response = await fetch('http://localhost:5000/question', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          utilisateur_id: user.id, // ✅ Envoi correct de l'ID utilisateur
-          contenu: input,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ utilisateur_id: user.id, contenu: input }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Question ajoutée avec succès:', data);
+        console.log('✅ Question traitée avec succès:', data);
 
-        // Ajouter une réponse générée par défaut
         const aiMessage: Message = {
           id: Date.now() + 1,
-          text: "Ceci est une réponse générée par défaut.",
+          text: data.reponse || "Je n'ai pas trouvé de réponse à votre question.",
           isUser: false,
         };
-        setMessages(prev => [...prev, aiMessage]);
+        setMessages((prev) => [...prev, aiMessage]);
 
         // Envoyer la réponse générée vers la base de données
         await fetch('http://localhost:5000/reponse', {
@@ -69,14 +64,15 @@ const Home: React.FC = () => {
           body: JSON.stringify({
             question_id: data.id,
             contenu: aiMessage.text,
-            source: 'test', // Remplacez par la source appropriée si nécessaire
+            source: 'base_connaissance', // Indiquer que la réponse provient de la base de connaissances
           }),
         });
       } else {
-        console.error('❌ Échec de l’ajout de la question');
+        const errorData = await response.json();
+        console.error('❌ Erreur lors de l’ajout de la question:', errorData);
       }
     } catch (error) {
-      console.error('❌ Erreur lors de la soumission de la question:', error);
+      console.error('❌ Erreur réseau:', error);
     }
   };
 
@@ -92,7 +88,7 @@ const Home: React.FC = () => {
               </p>
               {!user && (
                 <Link to="/login" className="login-button">
-                  Se connecter pour commencer à discuter
+                  Se connecter pour discuter
                 </Link>
               )}
             </div>
@@ -100,10 +96,7 @@ const Home: React.FC = () => {
         ) : (
           <div className="messages-container">
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}
-              >
+              <div key={message.id} className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
                 {message.text}
               </div>
             ))}

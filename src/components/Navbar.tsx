@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, MessageSquare, ChevronDown, User, BookOpen, LogOut } from 'lucide-react';
+import { Home, MessageSquare, ChevronDown, User, BookOpen, LogOut, Database } from 'lucide-react';
 import '../styles/Navbar.css';
 import { UserContext } from '../context/UserContext';
 
@@ -56,6 +56,14 @@ const Navbar: React.FC = () => {
                     >
                       <User className="dropdown-item-icon" />
                       Mon Compte
+                    </Link>
+                    <Link
+                      to="/admin-knowledge"
+                      className="dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <Database className="dropdown-item-icon" />
+                      Ajouter Connaissance
                     </Link>
                     <button
                       onClick={() => {
