@@ -1,7 +1,91 @@
+body {
+  overflow: hidden; /* Empêche le défilement de la page */
+}
+
 .home-container {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 64px);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg, #187bcd, #99bbc8, #2db5d5, #ff7e5f); /* Ajoutez une couleur supplémentaire */
+}
+
+@keyframes moveBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.home-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, #187bcd, #99bbc8, #2db5d5, #ff7e5f); /* Ajoutez une couleur supplémentaire */
+  background-size: 400% 400%; /* Augmentez la taille de l'arrière-plan */
+  animation: moveBackground 3s ease infinite; /* Réduisez la durée de l'animation */
+  z-index: -1;
+  opacity: 0.7;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animated-element {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  animation: float 4s ease-in-out infinite;
+}
+
+.animated-element:nth-child(1) {
+  top: 20%;
+  left: 10%;
+  animation-duration: 4s;
+}
+
+.animated-element:nth-child(2) {
+  top: 40%;
+  left: 30%;
+  animation-duration: 6s;
+}
+
+.animated-element:nth-child(3) {
+  top: 60%;
+  left: 50%;
+  animation-duration: 5s;
+}
+
+.animated-element:nth-child(4) {
+  top: 80%;
+  left: 70%;
+  animation-duration: 7s;
+}
+
+.animated-element:nth-child(5) {
+  top: 50%;
+  left: 90%;
+  animation-duration: 3s;
 }
 
 .chat-area {
@@ -142,4 +226,3 @@
   background-color: #1d4ed8;
   transform: scale(1.05);
 }
-
