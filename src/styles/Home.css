@@ -1,5 +1,5 @@
 body {
-  overflow: hidden; /* Empêche le défilement de la page */
+  overflow: hidden; 
 }
 
 .home-container {
@@ -8,7 +8,7 @@ body {
   height: calc(100vh - 64px);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(120deg, #187bcd, #99bbc8, #2db5d5, #ff7e5f); /* Ajoutez une couleur supplémentaire */
+  background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
 }
 
 @keyframes moveBackground {
@@ -94,6 +94,7 @@ body {
   padding: 1rem;
   background-color: white;
   scroll-behavior: smooth;
+  background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
 }
 
 .welcome-container {
@@ -101,6 +102,7 @@ body {
   align-items: center;
   justify-content: center;
   height: 100%;
+  background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
 }
 
 .welcome-content {
@@ -112,10 +114,11 @@ body {
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color:white;
 }
 
 .welcome-text {
-  color: #4b5563;
+  color: white;
   margin-bottom: 1rem;
 }
 
@@ -163,6 +166,7 @@ body {
   padding: 1rem;
   background-color: white;
   border-top: 1px solid #e5e7eb;
+  background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
 }
 
 .input-form {
