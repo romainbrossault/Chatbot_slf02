@@ -2,7 +2,7 @@ import express from "express";
 import mysql from "mysql2";
 import dotenv from "dotenv";
 import cors from "cors";
-import nlp from "compromise";
+import natural from "natural";
 
 dotenv.config();
 const app = express();
@@ -98,8 +98,17 @@ app.post("/question", (req, res) => {
         console.log(`📩 Question ajoutée avec ID ${questionId}`);
 
         // Analyse NLP pour extraire les mots-clés
-        const doc = nlp(contenu);
-        const keywords = doc.nouns().out('array');
+        const tokenizer = new natural.WordTokenizer();
+        const tokens = tokenizer.tokenize(contenu);
+        const tfidf = new natural.TfIdf();
+        tfidf.addDocument(tokens);
+
+        const keywords = [];
+        tfidf.listTerms(0).forEach(term => {
+            if (term.tfidf > 0.1) { // Adjust the threshold as needed
+                keywords.push(term.term);
+            }
+        });
 
         console.log("🔍 Mots-clés extraits:", keywords);
 
