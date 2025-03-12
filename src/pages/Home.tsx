@@ -64,15 +64,28 @@ const Home: React.FC = () => {
           body: JSON.stringify({
             question_id: data.id,
             contenu: aiMessage.text,
-            source: 'base_connaissance', // Indiquer que la réponse provient de la base de connaissances
+            source: 'base_connaissance', 
+            connaissance_id: data.connaissance_id || null, 
           }),
         });
       } else {
         const errorData = await response.json();
         console.error('❌ Erreur lors de l’ajout de la question:', errorData);
+        const aiMessage: Message = {
+          id: Date.now() + 1,
+          text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
+          isUser: false,
+        };
+        setMessages((prev) => [...prev, aiMessage]);
       }
     } catch (error) {
       console.error('❌ Erreur réseau:', error);
+      const aiMessage: Message = {
+        id: Date.now() + 1,
+        text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
+        isUser: false,
+      };
+      setMessages((prev) => [...prev, aiMessage]);
     }
   };
 
