@@ -230,3 +230,23 @@ body {
   background-color: #1d4ed8;
   transform: scale(1.05);
 }
+
+.message-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.user-message-wrapper {
+  justify-content: flex-end;
+}
+
+.ai-message-wrapper {
+  justify-content: flex-start;
+}
+
+.ai-logo {
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+  vertical-align: middle;
+}

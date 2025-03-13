@@ -4,6 +4,8 @@ import { Send } from 'lucide-react';
 import '../styles/Home.css';
 import { UserContext } from '../context/UserContext';
 
+import logo from '../img/logo02.svg';
+
 interface Message {
   id: number;
   text: string;
@@ -64,8 +66,8 @@ const Home: React.FC = () => {
           body: JSON.stringify({
             question_id: data.id,
             contenu: aiMessage.text,
-            source: 'base_connaissance', 
-            connaissance_id: data.connaissance_id || null, 
+            source: 'base_connaissance',
+            connaissance_id: data.connaissance_id || null,
           }),
         });
       } else {
@@ -109,8 +111,11 @@ const Home: React.FC = () => {
         ) : (
           <div className="messages-container">
             {messages.map((message) => (
-              <div key={message.id} className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
-                {message.text}
+              <div key={message.id} className={`message-wrapper ${message.isUser ? 'user-message-wrapper' : 'ai-message-wrapper'}`}>
+                {!message.isUser && <img src={logo} alt="Logo" className="ai-logo" />}
+                <div className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
+                  {message.text}
+                </div>
               </div>
             ))}
           </div>
