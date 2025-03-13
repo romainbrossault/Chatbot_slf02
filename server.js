@@ -211,7 +211,7 @@ app.get("/base_connaissance", (req, res) => {
 });
 
 app.post("/base_connaissance", (req, res) => {
-    const { mot_cle, contenu } = req.body;
+    const { mot_cle, contenu } = req.body; 
     const query = "INSERT INTO base_connaissance (mot_cle, contenu, date_mise_a_jour) VALUES (?, ?, NOW())";
 
     db.query(query, [mot_cle, contenu], (err, result) => {
