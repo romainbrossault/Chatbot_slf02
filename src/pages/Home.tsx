@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Send } from 'lucide-react';
 import '../styles/Home.css';
@@ -17,6 +17,7 @@ const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
+  const chatAreaRef = useRef<HTMLDivElement>(null);
 
   console.log("Utilisateur connecté:", user); // Debug
 
@@ -91,9 +92,15 @@ const Home: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (chatAreaRef.current) {
+      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className="home-container">
-      <div className="chat-area">
+      <div className="chat-area" ref={chatAreaRef}>
         {messages.length === 0 ? (
           <div className="welcome-container">
             <div className="welcome-content">
