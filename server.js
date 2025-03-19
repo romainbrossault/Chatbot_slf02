@@ -116,8 +116,8 @@ app.post("/question", (req, res) => {
             return res.status(400).json({ error: "⚠️ Aucun mot-clé trouvé dans la question" });
         }
 
-        // Rechercher une réponse basée sur les mots-clés trouvés
-        const querySearchKnowledge = "SELECT id, contenu FROM base_connaissance WHERE mot_cle IN (?) LIMIT 1";
+        // Rechercher des réponses basées sur les mots-clés trouvés
+        const querySearchKnowledge = "SELECT id, contenu FROM base_connaissance WHERE mot_cle IN (?)";
         db.query(querySearchKnowledge, [keywords], (err, knowledgeResults) => {
             if (err) {
                 console.error("Erreur SQL lors de la recherche dans la base de connaissances:", err);
@@ -125,11 +125,13 @@ app.post("/question", (req, res) => {
                 return;
             }
 
-            let responseContent;
-            let connaissanceId = null;
+            let responseContent = "";
+            let connaissanceIds = [];
             if (knowledgeResults.length > 0) {
-                responseContent = knowledgeResults[0].contenu;
-                connaissanceId = knowledgeResults[0].id;
+                knowledgeResults.forEach(result => {
+                    responseContent += result.contenu + " ";
+                    connaissanceIds.push(result.id);
+                });
             } else {
                 responseContent = "Je n'ai pas trouvé de réponse à votre question.";
             }
@@ -138,7 +140,7 @@ app.post("/question", (req, res) => {
 
             // Insérer la réponse dans la table "reponse"
             const queryInsertResponse = "INSERT INTO reponse (question_id, connaissance_id, contenu, source, date_reponse) VALUES (?, ?, ?, 'base_connaissance', NOW())";
-            db.query(queryInsertResponse, [questionId, connaissanceId, responseContent], (err, responseResult) => {
+            db.query(queryInsertResponse, [questionId, connaissanceIds.join(','), responseContent.trim()], (err, responseResult) => {
                 if (err) {
                     console.error("❌ Erreur SQL lors de l'ajout de la réponse:", err);
                     res.status(500).send("Erreur serveur");
@@ -152,7 +154,7 @@ app.post("/question", (req, res) => {
                     utilisateur_id,
                     contenu,
                     date_question: new Date(),
-                    reponse: responseContent
+                    reponse: responseContent.trim()
                 });
             });
         });
@@ -211,7 +213,7 @@ app.get("/base_connaissance", (req, res) => {
 });
 
 app.post("/base_connaissance", (req, res) => {
-    const { mot_cle, contenu } = req.body; 
+    const { mot_cle, contenu } = req.body;
     const query = "INSERT INTO base_connaissance (mot_cle, contenu, date_mise_a_jour) VALUES (?, ?, NOW())";
 
     db.query(query, [mot_cle, contenu], (err, result) => {
