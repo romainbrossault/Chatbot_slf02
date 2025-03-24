@@ -3,6 +3,7 @@ import mysql from "mysql2";
 import dotenv from "dotenv";
 import cors from "cors";
 import natural from "natural";
+import fetch from "node-fetch";
 
 dotenv.config();
 const app = express();
@@ -75,8 +76,8 @@ app.post("/utilisateur", (req, res) => {
 });
 
 // Ajouter une question et obtenir une réponse basée sur la base de connaissances
-app.post("/question", (req, res) => {
-    const { utilisateur_id, contenu } = req.body;
+app.post("/question", async (req, res) => {
+    const { utilisateur_id, contenu, recherche_intelligente } = req.body;
 
     if (!utilisateur_id) {
         return res.status(400).json({ error: "⚠️ ID utilisateur manquant" });
@@ -87,7 +88,7 @@ app.post("/question", (req, res) => {
 
     const queryInsertQuestion = "INSERT INTO question (utilisateur_id, contenu, date_question) VALUES (?, ?, NOW())";
     
-    db.query(queryInsertQuestion, [utilisateur_id, contenu], (err, result) => {
+    db.query(queryInsertQuestion, [utilisateur_id, contenu], async (err, result) => {
         if (err) {
             console.error("❌ Erreur SQL lors de l'ajout de la question:", err);
             res.status(500).send("Erreur serveur");
@@ -116,48 +117,104 @@ app.post("/question", (req, res) => {
             return res.status(400).json({ error: "⚠️ Aucun mot-clé trouvé dans la question" });
         }
 
-        // Rechercher des réponses basées sur les mots-clés trouvés
-        const querySearchKnowledge = "SELECT id, contenu FROM base_connaissance WHERE mot_cle IN (?)";
-        db.query(querySearchKnowledge, [keywords], (err, knowledgeResults) => {
-            if (err) {
-                console.error("Erreur SQL lors de la recherche dans la base de connaissances:", err);
-                res.status(500).send("Erreur serveur");
-                return;
-            }
+        let responseContent = "";
 
-            let responseContent = "";
-            let connaissanceIds = [];
-            if (knowledgeResults.length > 0) {
-                knowledgeResults.forEach(result => {
-                    responseContent += result.contenu + " ";
-                    connaissanceIds.push(result.id);
-                });
-            } else {
-                responseContent = "Je n'ai pas trouvé de réponse à votre question.";
-            }
-
-            console.log("🤖 Réponse générée:", responseContent);
-
-            // Insérer la réponse dans la table "reponse"
-            const queryInsertResponse = "INSERT INTO reponse (question_id, connaissance_id, contenu, source, date_reponse) VALUES (?, ?, ?, 'base_connaissance', NOW())";
-            db.query(queryInsertResponse, [questionId, connaissanceIds.join(','), responseContent.trim()], (err, responseResult) => {
+        if (recherche_intelligente) {
+            // Rechercher des mots-clés dans la base de connaissances
+            const querySearchKnowledge = "SELECT mot_cle FROM base_connaissance WHERE mot_cle IN (?)";
+            db.query(querySearchKnowledge, [keywords], async (err, knowledgeResults) => {
                 if (err) {
-                    console.error("❌ Erreur SQL lors de l'ajout de la réponse:", err);
+                    console.error("Erreur SQL lors de la recherche dans la base de connaissances:", err);
                     res.status(500).send("Erreur serveur");
                     return;
                 }
 
-                console.log(`✅ Réponse ajoutée avec ID ${responseResult.insertId}`);
+                const knowledgeKeywords = knowledgeResults.map(result => result.mot_cle);
+                console.log("🔍 Mots-clés de la base de connaissances:", knowledgeKeywords);
 
-                res.json({
-                    id: questionId,
-                    utilisateur_id,
-                    contenu,
-                    date_question: new Date(),
-                    reponse: responseContent.trim()
+                // Utiliser les mots-clés de la base de connaissances pour effectuer une recherche sur Internet
+                try {
+                    const bingResponse = await fetch("https://api.bing.microsoft.com/v7.0/search", {
+                        method: 'GET',
+                        headers: { "Ocp-Apim-Subscription-Key": process.env.BING_API_KEY },
+                        params: { q: knowledgeKeywords.join(" ") }
+                    });
+
+                    const bingData = await bingResponse.json();
+                    const webPages = bingData.webPages;
+                    if (webPages && webPages.value && webPages.value.length > 0) {
+                        responseContent = webPages.value[0].snippet;
+                    } else {
+                        responseContent = "Je n'ai pas trouvé de réponse à votre question sur Internet.";
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la recherche Bing:", error);
+                    responseContent = "Je n'ai pas pu effectuer une recherche sur Internet.";
+                }
+
+                console.log("🤖 Réponse générée:", responseContent);
+
+                // Insérer la réponse dans la table "reponse"
+                const queryInsertResponse = "INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'internet', NOW())";
+                db.query(queryInsertResponse, [questionId, responseContent.trim()], (err, responseResult) => {
+                    if (err) {
+                        console.error("❌ Erreur SQL lors de l'ajout de la réponse:", err);
+                        res.status(500).send("Erreur serveur");
+                        return;
+                    }
+
+                    console.log(`✅ Réponse ajoutée avec ID ${responseResult.insertId}`);
+
+                    res.json({
+                        id: questionId,
+                        utilisateur_id,
+                        contenu,
+                        date_question: new Date(),
+                        reponse: responseContent.trim()
+                    });
                 });
             });
-        });
+        } else {
+            // Rechercher des réponses basées sur les mots-clés trouvés
+            const querySearchKnowledge = "SELECT contenu FROM base_connaissance WHERE mot_cle IN (?)";
+            db.query(querySearchKnowledge, [keywords], (err, knowledgeResults) => {
+                if (err) {
+                    console.error("Erreur SQL lors de la recherche dans la base de connaissances:", err);
+                    res.status(500).send("Erreur serveur");
+                    return;
+                }
+
+                if (knowledgeResults.length > 0) {
+                    knowledgeResults.forEach(result => {
+                        responseContent += result.contenu + " ";
+                    });
+                } else {
+                    responseContent = "Je n'ai pas trouvé de réponse à votre question.";
+                }
+
+                console.log("🤖 Réponse générée:", responseContent);
+
+                // Insérer la réponse dans la table "reponse"
+                const queryInsertResponse = "INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())";
+                db.query(queryInsertResponse, [questionId, responseContent.trim()], (err, responseResult) => {
+                    if (err) {
+                        console.error("❌ Erreur SQL lors de l'ajout de la réponse:", err);
+                        res.status(500).send("Erreur serveur");
+                        return;
+                    }
+
+                    console.log(`✅ Réponse ajoutée avec ID ${responseResult.insertId}`);
+
+                    res.json({
+                        id: questionId,
+                        utilisateur_id,
+                        contenu,
+                        date_question: new Date(),
+                        reponse: responseContent.trim()
+                    });
+                });
+            });
+        }
     });
 });
 
@@ -188,15 +245,15 @@ app.get("/reponse", (req, res) => {
 // Ajouter une réponse générée
 app.post("/reponse", (req, res) => {
     const { question_id, contenu, source } = req.body;
-    const query = "INSERT INTO reponse (question_id, connaissance_id, contenu, source, date_reponse) VALUES (?, ?, ?, ?, NOW())";
+    const query = "INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, ?, NOW())";
 
-    db.query(query, [question_id, 1, contenu, source], (err, result) => {
+    db.query(query, [question_id, contenu, source], (err, result) => {
         if (err) {
             console.error("Erreur SQL:", err);
             res.status(500).send("Erreur serveur");
             return;
         }
-        res.json({ id: result.insertId, question_id, connaissance_id: 1, contenu, source });
+        res.json({ id: result.insertId, question_id, contenu, source });
     });
 });
 

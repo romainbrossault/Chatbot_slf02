@@ -15,6 +15,7 @@ interface Message {
 const Home: React.FC = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [rechercheIntelligente, setRechercheIntelligente] = useState(false);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
@@ -39,12 +40,12 @@ const Home: React.FC = () => {
     setInput('');
 
     try {
-      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: input });
+      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: input, recherche_intelligente: rechercheIntelligente });
 
       const response = await fetch('http://localhost:5000/question', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ utilisateur_id: user.id, contenu: input }),
+        body: JSON.stringify({ utilisateur_id: user.id, contenu: input, recherche_intelligente: rechercheIntelligente }),
       });
 
       if (response.ok) {
@@ -68,7 +69,6 @@ const Home: React.FC = () => {
             question_id: data.id,
             contenu: aiMessage.text,
             source: 'base_connaissance',
-            connaissance_id: data.connaissance_id || null,
           }),
         });
       } else {
@@ -142,10 +142,21 @@ const Home: React.FC = () => {
               <Send className="h-5 w-5" />
             </button>
           </form>
+          <div className="recherche-option">
+            <label className="recherche-label">
+              <input
+                type="checkbox"
+                checked={rechercheIntelligente}
+                onChange={(e) => setRechercheIntelligente(e.target.checked)}
+                className="recherche-checkbox"
+              />
+              <span className="recherche-text">Recherche intelligente</span>
+            </label>
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default Home;
+export default Home; 
