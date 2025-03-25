@@ -4,22 +4,43 @@ import { Send } from 'lucide-react';
 import '../styles/Home.css';
 import { UserContext } from '../context/UserContext';
 
-import logo from '../img/logo02.svg';
 
 interface Message {
   id: number;
   text: string;
   isUser: boolean;
+  files?: { name: string; type: string }[]; // Tableau pour les fichiers
 }
 
 const Home: React.FC = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Tableau pour les fichiers sélectionnés
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
 
-  console.log("Utilisateur connecté:", user); // Debug
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const allowedTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ];
+      const validFiles = Array.from(files).filter((file) =>
+        allowedTypes.includes(file.type)
+      );
+
+      if (validFiles.length === 0) {
+        alert('Seuls les fichiers PDF, DOCX et Excel sont acceptés.');
+        return;
+      }
+
+      // Ajoutez les fichiers valides au tableau sans les afficher comme messages
+      setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,29 +48,37 @@ const Home: React.FC = () => {
       navigate('/login');
       return;
     }
-    if (input.trim() === '') return;
+    if (input.trim() === '' && selectedFiles.length === 0) return;
 
+    // Ajouter le message utilisateur avec texte et fichiers
     const userMessage: Message = {
       id: Date.now(),
       text: input,
       isUser: true,
+      files: selectedFiles.map((file) => ({ name: file.name, type: file.type })),
     };
-
     setMessages([...messages, userMessage]);
-    setInput('');
+
+    // Préparer les données pour l'envoi
+    const formData = new FormData();
+    formData.append('utilisateur_id', user.id.toString());
+    formData.append('contenu', input);
+
+    selectedFiles.forEach((file) => {
+      formData.append('fichiers', file); // Ajoutez chaque fichier au FormData
+    });
 
     try {
-      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: input });
+      console.log('Envoi de la requête avec texte et fichiers :', formData);
 
-      const response = await fetch('http://localhost:5000/question', {
+      const response = await fetch('http://localhost:5000/analyse', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ utilisateur_id: user.id, contenu: input }),
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Question traitée avec succès:', data);
+        console.log('✅ Réponse analysée avec succès:', data);
 
         const aiMessage: Message = {
           id: Date.now() + 1,
@@ -57,39 +86,17 @@ const Home: React.FC = () => {
           isUser: false,
         };
         setMessages((prev) => [...prev, aiMessage]);
-
-        // Envoyer la réponse générée vers la base de données
-        await fetch('http://localhost:5000/reponse', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            question_id: data.id,
-            contenu: aiMessage.text,
-            source: 'base_connaissance',
-            connaissance_id: data.connaissance_id || null,
-          }),
-        });
       } else {
         const errorData = await response.json();
-        console.error('❌ Erreur lors de l’ajout de la question:', errorData);
-        const aiMessage: Message = {
-          id: Date.now() + 1,
-          text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
-          isUser: false,
-        };
-        setMessages((prev) => [...prev, aiMessage]);
+        console.error('❌ Erreur lors de l’analyse de la requête:', errorData);
       }
     } catch (error) {
       console.error('❌ Erreur réseau:', error);
-      const aiMessage: Message = {
-        id: Date.now() + 1,
-        text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
-        isUser: false,
-      };
-      setMessages((prev) => [...prev, aiMessage]);
     }
+
+    // Réinitialiser l'état après l'envoi
+    setInput('');
+    setSelectedFiles([]); // Réinitialisez les fichiers sélectionnés
   };
 
   useEffect(() => {
@@ -118,11 +125,23 @@ const Home: React.FC = () => {
         ) : (
           <div className="messages-container">
             {messages.map((message) => (
-              <div key={message.id} className={`message-wrapper ${message.isUser ? 'user-message-wrapper' : 'ai-message-wrapper'}`}>
-                {!message.isUser && <img src={logo} alt="Logo" className="ai-logo" />}
-                <div className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
-                  {message.text}
-                </div>
+              <div
+                key={message.id}
+                className={`message-group ${
+                  message.isUser ? 'user-message-group' : 'ai-message-group'
+                }`}
+              >
+                {message.files &&
+                  message.files.map((file, index) => (
+                    <div key={index} className="message file-message">
+                      <strong>Fichier :</strong> {file.name} ({file.type})
+                    </div>
+                  ))}
+                {message.text && (
+                  <div className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
+                    {message.text}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -130,6 +149,15 @@ const Home: React.FC = () => {
       </div>
       {user && (
         <div className="input-area">
+          {selectedFiles.length > 0 && (
+            <div className="file-preview">
+              {selectedFiles.map((file, index) => (
+                <p key={index}>
+                  <strong>Fichier sélectionné :</strong> {file.name} ({file.type})
+                </p>
+              ))}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="input-form">
             <input
               type="text"
@@ -138,6 +166,19 @@ const Home: React.FC = () => {
               placeholder="Posez votre question ici..."
               className="message-input"
             />
+            <label htmlFor="file-upload" className="file-upload-button">
+              <span role="img" aria-label="upload">
+                📤
+              </span>
+              <input
+                id="file-upload"
+                type="file"
+                accept=".pdf,.docx,.xlsx"
+                multiple
+                onChange={handleFileUpload}
+                className="file-input"
+              />
+            </label>
             <button type="submit" className="send-button">
               <Send className="h-5 w-5" />
             </button>

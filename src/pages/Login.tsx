@@ -14,12 +14,17 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:5000/utilisateur/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/utilisateur/login?email=${encodeURIComponent(
+          email
+        )}&password=${encodeURIComponent(password)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -44,7 +49,7 @@ const Login: React.FC = () => {
           <div className="input-group">
             <div className="input-wrapper">
               <div className="input-icon">
-                <User className="h-5 w-5" />
+                <User className="icon-svg" />
               </div>
               <input
                 id="email-address"
@@ -62,7 +67,7 @@ const Login: React.FC = () => {
           <div className="input-group">
             <div className="input-wrapper">
               <div className="input-icon">
-                <Lock className="h-5 w-5" />
+                <Lock className="icon-svg" />
               </div>
               <input
                 id="password"
@@ -99,10 +104,7 @@ const Login: React.FC = () => {
           </div>
 
           <div>
-            <button
-              type="submit"
-              className="login-button"
-            >
+            <button type="submit" className="login-button">
               Se connecter
             </button>
           </div>
