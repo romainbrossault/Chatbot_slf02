@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Send } from 'lucide-react';
+import { Send, ThumbsUp, ThumbsDown } from 'lucide-react';
 import '../styles/Home.css';
 import { UserContext } from '../context/UserContext';
 
@@ -10,6 +10,7 @@ interface Message {
   id: number;
   text: string;
   isUser: boolean;
+  reponseId?: number;
 }
 
 const Home: React.FC = () => {
@@ -55,22 +56,9 @@ const Home: React.FC = () => {
           id: Date.now() + 1,
           text: data.reponse || "Je n'ai pas trouvé de réponse à votre question.",
           isUser: false,
+          reponseId: data.reponse_id,
         };
         setMessages((prev) => [...prev, aiMessage]);
-
-        // Envoyer la réponse générée vers la base de données
-        await fetch('http://localhost:5000/reponse', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            question_id: data.id,
-            contenu: aiMessage.text,
-            source: 'base_connaissance',
-            connaissance_id: data.connaissance_id || null,
-          }),
-        });
       } else {
         const errorData = await response.json();
         console.error('❌ Erreur lors de l’ajout de la question:', errorData);
@@ -89,6 +77,25 @@ const Home: React.FC = () => {
         isUser: false,
       };
       setMessages((prev) => [...prev, aiMessage]);
+    }
+  };
+
+  const handleValidation = async (reponseId: number, isValid: boolean) => {
+    const endpoint = isValid ? 'valider' : 'invalider';
+    try {
+      const response = await fetch(`http://localhost:5000/reponse/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reponse_id: reponseId }),
+      });
+
+      if (response.ok) {
+        console.log(`✅ Réponse ${isValid ? 'validée' : 'invalidée'} avec succès`);
+      } else {
+        console.error(`❌ Erreur lors de la ${isValid ? 'validation' : 'invalidation'} de la réponse`);
+      }
+    } catch (error) {
+      console.error(`❌ Erreur réseau lors de la ${isValid ? 'validation' : 'invalidation'} de la réponse:`, error);
     }
   };
 
@@ -123,6 +130,16 @@ const Home: React.FC = () => {
                 <div className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
                   {message.text}
                 </div>
+                {!message.isUser && message.reponseId && (
+                  <div className="validation-buttons">
+                    <button onClick={() => handleValidation(message.reponseId!, true)}>
+                      <ThumbsUp className="h-5 w-5" />
+                    </button>
+                    <button onClick={() => handleValidation(message.reponseId!, false)}>
+                      <ThumbsDown className="h-5 w-5" />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
