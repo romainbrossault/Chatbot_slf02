@@ -15,11 +15,8 @@ interface Message {
 const Home: React.FC = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-<<<<<<< HEAD
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Tableau pour les fichiers sélectionnés
-=======
   const [rechercheIntelligente, setRechercheIntelligente] = useState(false);
->>>>>>> bd771ee123412df9ccb00922a30e3e411a3fa018
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
@@ -73,20 +70,15 @@ const Home: React.FC = () => {
     });
 
     try {
-<<<<<<< HEAD
       console.log('Envoi de la requête avec texte et fichiers :', formData);
-=======
+
       console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: input, recherche_intelligente: rechercheIntelligente });
->>>>>>> bd771ee123412df9ccb00922a30e3e411a3fa018
+
 
       const response = await fetch('http://localhost:5000/analyse', {
         method: 'POST',
-<<<<<<< HEAD
         body: formData,
-=======
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ utilisateur_id: user.id, contenu: input, recherche_intelligente: rechercheIntelligente }),
->>>>>>> bd771ee123412df9ccb00922a30e3e411a3fa018
       });
 
       if (response.ok) {
@@ -99,8 +91,6 @@ const Home: React.FC = () => {
           isUser: false,
         };
         setMessages((prev) => [...prev, aiMessage]);
-<<<<<<< HEAD
-=======
 
         // Envoyer la réponse générée vers la base de données
         await fetch('http://localhost:5000/reponse', {
@@ -114,7 +104,7 @@ const Home: React.FC = () => {
             source: 'base_connaissance',
           }),
         });
->>>>>>> bd771ee123412df9ccb00922a30e3e411a3fa018
+
       } else {
         const errorData = await response.json();
         console.error('❌ Erreur lors de l’analyse de la requête:', errorData);
