@@ -251,6 +251,7 @@ body {
   vertical-align: middle;
 }
 
+<<<<<<< HEAD
 .file-upload-button {
   display: flex;
   align-items: center;
@@ -319,4 +320,26 @@ body {
   max-width: 45rem;
   word-wrap: break-word;
   font-size: 0.875rem;
+=======
+
+
+.recherche-option {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.recherche-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.recherche-checkbox {
+  margin-right: 10px;
+}
+
+.recherche-text {
+  font-size: 14px;
+>>>>>>> bd771ee123412df9ccb00922a30e3e411a3fa018
 }
