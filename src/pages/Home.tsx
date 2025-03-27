@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Send, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Send, ThumbsUp, ThumbsDown, Key } from 'lucide-react';
 import '../styles/Home.css';
 import { UserContext } from '../context/UserContext';
 
@@ -16,6 +16,7 @@ interface Message {
 const Home: React.FC = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [conversationId, setConversationId] = useState<number | null>(null); // Identifiant de conversation
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
@@ -45,7 +46,11 @@ const Home: React.FC = () => {
       const response = await fetch('http://localhost:5000/question', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ utilisateur_id: user.id, contenu: input }),
+        body: JSON.stringify({
+          utilisateur_id: user.id,
+          contenu: input,
+          conversation_id: conversationId, // Inclure l'identifiant de conversation
+        }),
       });
 
       if (response.ok) {
@@ -59,6 +64,11 @@ const Home: React.FC = () => {
           reponseId: data.reponse_id,
         };
         setMessages((prev) => [...prev, aiMessage]);
+
+        // Si c'est le premier message, définir l'identifiant de conversation
+        if (!conversationId) {
+          setConversationId(data.conversation_id);
+        }
       } else {
         const errorData = await response.json();
         console.error('❌ Erreur lors de l’ajout de la question:', errorData);
@@ -80,23 +90,8 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleValidation = async (reponseId: number, isValid: boolean) => {
-    const endpoint = isValid ? 'valider' : 'invalider';
-    try {
-      const response = await fetch(`http://localhost:5000/reponse/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reponse_id: reponseId }),
-      });
-
-      if (response.ok) {
-        console.log(`✅ Réponse ${isValid ? 'validée' : 'invalidée'} avec succès`);
-      } else {
-        console.error(`❌ Erreur lors de la ${isValid ? 'validation' : 'invalidation'} de la réponse`);
-      }
-    } catch (error) {
-      console.error(`❌ Erreur réseau lors de la ${isValid ? 'validation' : 'invalidation'} de la réponse:`, error);
-    }
+  const handleTestPassword = () => {
+    setInput("Tester mon mot de passe : ");
   };
 
   useEffect(() => {
@@ -130,16 +125,6 @@ const Home: React.FC = () => {
                 <div className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
                   {message.text}
                 </div>
-                {!message.isUser && message.reponseId && (
-                  <div className="validation-buttons">
-                    <button onClick={() => handleValidation(message.reponseId!, true)}>
-                      <ThumbsUp className="h-5 w-5" />
-                    </button>
-                    <button onClick={() => handleValidation(message.reponseId!, false)}>
-                      <ThumbsDown className="h-5 w-5" />
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -148,6 +133,14 @@ const Home: React.FC = () => {
       {user && (
         <div className="input-area">
           <form onSubmit={handleSubmit} className="input-form">
+            <button
+              type="button"
+              onClick={handleTestPassword}
+              className="test-password-button"
+            >
+              <Key className="h-5 w-5" />
+              Tester MDP
+            </button>
             <input
               type="text"
               value={input}
@@ -165,4 +158,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Home; 

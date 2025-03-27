@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
               {user && (
                 <Link to="/chats" className="navbar-link">
                   <MessageSquare className="link-icon" />
-                  Mes Conversations
+                  Mes Questions
                 </Link>
               )}
             </div>

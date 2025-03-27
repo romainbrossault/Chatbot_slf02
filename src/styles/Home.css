@@ -340,3 +340,27 @@ body {
 .recherche-text {
   font-size: 14px;
 }
+
+.test-password-button {
+  background-color: #1d4ed8;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.test-password-button:hover {
+  background-color: #2563eb;
+  transform: scale(1.05);
+}
+
+.test-password-button:active {
+  transform: scale(0.95);
+}
+
