@@ -71,6 +71,26 @@ const ManageTheme: React.FC = () => {
     }
   };
 
+  const handleDeleteTheme = async (themeId: number) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce thème ?')) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/theme/${themeId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Supprimer le thème localement
+        setThemes((prevThemes) => prevThemes.filter((theme) => theme.id !== themeId));
+        alert('Thème supprimé avec succès.');
+      } else {
+        alert('Erreur lors de la suppression du thème.');
+      }
+    } catch (err) {
+      alert('Erreur réseau. Veuillez réessayer.');
+    }
+  };
+
   return (
     <div className="manage-theme-container">
       <h1 className="manage-theme-title">Gérer les Thèmes</h1>
@@ -83,12 +103,20 @@ const ManageTheme: React.FC = () => {
           {themes.map((theme) => (
             <li key={theme.id} className="theme-item">
               <span className="theme-name">{theme.nom}</span>
-              <button
-                className="edit-button"
-                onClick={() => openModal(theme)}
-              >
-                Modifier
-              </button>
+              <div className="theme-actions">
+                <button
+                  className="edit-button"
+                  onClick={() => openModal(theme)}
+                >
+                  Modifier
+                </button>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteTheme(theme.id)}
+                >
+                  Supprimer
+                </button>
+              </div>
             </li>
           ))}
         </ul>
