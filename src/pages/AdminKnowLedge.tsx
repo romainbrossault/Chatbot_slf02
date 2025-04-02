@@ -46,79 +46,6 @@ const AdminKnowledge: React.FC = () => {
     fetchKnowledge();
   }, []);
 
-  const handleAddTheme = async () => {
-    const newTheme = prompt('Entrez le nom du nouveau thème :');
-    if (newTheme) {
-      try {
-        const response = await fetch('http://localhost:5000/theme', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ nom: newTheme }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setThemes([...themes, data]);
-          setNotification('Thème ajouté avec succès !');
-          setTimeout(() => setNotification(null), 5000);
-        } else {
-          console.error('Erreur lors de l’ajout du thème');
-        }
-      } catch (error) {
-        console.error('Erreur réseau lors de l’ajout du thème:', error);
-      }
-    }
-  };
-
-  const handleDeleteTheme = async (id: number) => {
-    try {
-      const response = await fetch(`http://localhost:5000/theme/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setThemes(themes.filter((theme) => theme.id !== id));
-        setNotification('Thème supprimé avec succès !');
-        setTimeout(() => setNotification(null), 5000);
-      } else {
-        console.error('Erreur lors de la suppression du thème');
-      }
-    } catch (error) {
-      console.error('Erreur réseau lors de la suppression du thème:', error);
-    }
-  };
-
-  const handleRenameTheme = async (id: number) => {
-    const newName = prompt('Entrez le nouveau nom du thème :');
-    if (newName) {
-      try {
-        const response = await fetch(`http://localhost:5000/theme/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ nom: newName }),
-        });
-
-        if (response.ok) {
-          setThemes(
-            themes.map((theme) =>
-              theme.id === id ? { ...theme, nom: newName } : theme
-            )
-          );
-          setNotification('Thème renommé avec succès !');
-          setTimeout(() => setNotification(null), 5000);
-        } else {
-          console.error('Erreur lors du renommage du thème');
-        }
-      } catch (error) {
-        console.error('Erreur réseau lors du renommage du thème:', error);
-      }
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -173,28 +100,12 @@ const AdminKnowledge: React.FC = () => {
         {/* Bloc d'ajout de thème */}
         <div className="theme-block">
           <h2>Ajouter un Thème</h2>
-          <button onClick={handleAddTheme} className="add-theme-button">
-            Ajouter un Thème
+          <button
+            onClick={() => navigate('/manage-theme')} // Redirection vers la page "ManageTheme"
+            className="manage-theme-button"
+          >
+            Gérer les Thèmes
           </button>
-          <ul className="theme-list">
-            {themes.map((theme) => (
-              <li key={theme.id}>
-                {theme.nom}
-                <button
-                  onClick={() => handleRenameTheme(theme.id)}
-                  className="rename-button"
-                >
-                  Renommer
-                </button>
-                <button
-                  onClick={() => handleDeleteTheme(theme.id)}
-                  className="delete-button"
-                >
-                  Supprimer
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
 
         {/* Bloc d'ajout de contenu */}

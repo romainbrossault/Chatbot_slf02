@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Admin from './pages/Admin';
 import UserGuide from './pages/UserGuide';
 import Account from './pages/Account';
+import ManageTheme from './pages/ManageTheme';
 import AdminKnowledge from './pages/AdminKnowledge';
 import { UserProvider } from './context/UserContext';
 
@@ -27,6 +28,7 @@ function App() {
               <Route path="/guide" element={<UserGuide />} />
               <Route path="/account" element={<Account />} />
               <Route path="/admin-knowledge" element={<AdminKnowledge />} />
+              <Route path="/manage-theme" element={<ManageTheme />} />
             </Routes>
           </div>
         </div>

@@ -180,7 +180,7 @@ app.post("/reponse", (req, res) => {
     });
 });
 
-
+//
 
 // Fonction pour analyser la qualité d'un mot de passe
 function analyzePassword(password) {
