@@ -322,7 +322,7 @@ app.post("/question", async (req, res) => {
         if (bestMatch) {
             responseContent = bestMatch.contenu;
             reponseId = await new Promise((resolve, reject) => {
-                db.query("I NSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())", [questionId, responseContent.trim()], (err, result) => {
+                db.query("INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())", [questionId, responseContent.trim()], (err, result) => {
                     if (err) reject(err);
                     else resolve(result.insertId);
                 });
@@ -482,5 +482,9 @@ app.post("/base_connaissance", (req, res) => {
 });
 
 app.listen(PORT, () => {
+<<<<<<< HEAD
     console.log(`🚀 Serveur démarré sur ${PORT}`);
+=======
+    console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
+>>>>>>> parent of 083afbb (edit)
 });
