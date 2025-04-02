@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import '../styles/Register.css';
 import { UserContext } from '../context/UserContext';
+import { ChevronDown } from 'lucide-react';
 
 const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -139,21 +140,25 @@ const Register: React.FC = () => {
               className="form-input form-input-with-icon"
               placeholder="Confirmer le mot de passe"
             />
+            
           </div>
-          <div className="input-wrapper">
-            <label htmlFor="role" className="sr-only">
-              Rôle
-            </label>
-            <select
-              id="role"
-              name="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="form-input"
-            >
-              <option value="élève">Élève</option>
-              <option value="enseignant">Enseignant</option>
-            </select>
+          <div className="input-group">
+            <div className="select-wrapper">
+              <select
+                id="role"
+                name="role"
+                className="form-select"
+                required
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+              >
+                <option value="" disabled>
+                  Sélectionnez un rôle
+                </option>
+                <option value="eleve">Élève</option>
+                <option value="enseignant">Enseignant</option>
+              </select>
+            </div>
           </div>
 
           <div>

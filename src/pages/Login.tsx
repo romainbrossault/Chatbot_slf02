@@ -48,9 +48,9 @@ const Login: React.FC = () => {
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="input-group">
             <div className="input-wrapper">
-              <div className="input-icon">
+              <span className="input-icon">
                 <User className="icon-svg" />
-              </div>
+              </span>
               <input
                 id="email-address"
                 name="email"
@@ -66,9 +66,9 @@ const Login: React.FC = () => {
           </div>
           <div className="input-group">
             <div className="input-wrapper">
-              <div className="input-icon">
+              <span className="input-icon">
                 <Lock className="icon-svg" />
-              </div>
+              </span>
               <input
                 id="password"
                 name="password"
