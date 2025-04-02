@@ -325,7 +325,7 @@ app.post("/question", async (req, res) => {
         if (bestMatch) {
             responseContent = bestMatch.contenu;
             reponseId = await new Promise((resolve, reject) => {
-                db.query("INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())", [questionId, responseContent.trim()], (err, result) => {
+                db.query("I NSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())", [questionId, responseContent.trim()], (err, result) => {
                     if (err) reject(err);
                     else resolve(result.insertId);
                 });
@@ -483,6 +483,6 @@ app.post("/base_connaissance", (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Serveur démarré sur http://0.0.0.0:${PORT}`);
 });
