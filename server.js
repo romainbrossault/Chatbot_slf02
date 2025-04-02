@@ -214,7 +214,7 @@ function analyzePassword(password) {
         recommendations.push("Ajoutez des chiffres pour renforcer votre mot de passe.");
     }
 
-    if (/[\W_]/.test(password)) {
+    if (/[\W_]/.test(password)) {   
         score += 1;
     } else {
         recommendations.push("Ajoutez des caractères spéciaux (par exemple, @, #, $, %, etc.) pour renforcer votre mot de passe.");
@@ -232,14 +232,10 @@ function analyzePassword(password) {
 
 // Route pour gérer les questions
 app.post("/question", async (req, res) => {
-    const { utilisateur_id, contenu, conversation_id } = req.body;
+    const { utilisateur_id, contenu } = req.body;
 
-    if (!utilisateur_id) {
-        return res.status(400).json({ error: "⚠️ ID utilisateur manquant" });
-    }
-    if (!contenu) {
-        return res.status(400).json({ error: "⚠️ Contenu manquant" });
-    }
+    if (!utilisateur_id) return res.status(400).json({ error: "⚠️ ID utilisateur manquant" });
+    if (!contenu) return res.status(400).json({ error: "⚠️ Contenu manquant" });
 
     // Vérifier si la question contient un mot de passe
     const passwordRegex = /Tester mon mot de passe\s*:\s*(\S+)/i;
@@ -248,105 +244,118 @@ app.post("/question", async (req, res) => {
     if (match) {
         const password = match[1];
         const analysis = analyzePassword(password);
-
-        const responseContent = `Votre mot de passe a un score de sécurité de ${analysis.score}/5.\n` +
-            (analysis.recommendations.length > 0
-                ? "Voici quelques conseils pour l'améliorer :\n- " + analysis.recommendations.join("\n- ")
-                : "Votre mot de passe est fort. Bien joué !");
-
         return res.json({
             id: null,
             utilisateur_id,
             contenu,
             date_question: new Date(),
-            reponse: responseContent,
+            reponse: `Votre mot de passe a un score de sécurité de ${analysis.score}/5.\n` +
+                (analysis.recommendations.length > 0
+                    ? "Voici quelques conseils pour l'améliorer :\n- " + analysis.recommendations.join("\n- ")
+                    : "Votre mot de passe est fort. Bien joué !"),
             reponse_id: null,
         });
     }
 
-    // Logique existante pour gérer les questions et réponses
-    const queryInsertQuestion = "INSERT INTO question (utilisateur_id, contenu, date_question) VALUES (?, ?, NOW())";
-
-    db.query(queryInsertQuestion, [utilisateur_id, contenu], async (err, result) => {
-        if (err) {
-            console.error("❌ Erreur SQL lors de l'ajout de la question:", err);
-            res.status(500).send("Erreur serveur");
-            return;
-        }
-
-        const questionId = result.insertId;
-        console.log(`📩 Question ajoutée avec ID ${questionId}`);
-
-        // Rechercher des réponses basées sur le contenu de la question
-        const querySearchKnowledge = "SELECT id, contenu FROM base_connaissance";
-        db.query(querySearchKnowledge, (err, knowledgeResults) => {
-            if (err) {
-                console.error("Erreur SQL lors de la recherche dans la base de connaissances:", err);
-                res.status(500).send("Erreur serveur");
-                return;
-            }
-
-            let bestMatch = null;
-            let highestScore = 0;
-
-            knowledgeResults.forEach(result => {
-                const similarity = natural.JaroWinklerDistance(contenu, result.contenu);
-
-                if (similarity > highestScore) {
-                    highestScore = similarity;
-                    bestMatch = result;
-                }
+    try {
+        // Étape 1 : Identifier le thème de la question
+        const themes = await new Promise((resolve, reject) => {
+            db.query("SELECT id, nom FROM theme", (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
             });
+        });
 
-            let responseContent = "Je n'ai pas trouvé de réponse à votre question.";
-            let reponseId = null;
-            if (bestMatch) {
-                responseContent = bestMatch.contenu;
+        const tfidf = new natural.TfIdf();
+        themes.forEach((theme) => tfidf.addDocument(theme.nom));
 
-                const queryInsertResponse = "INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())";
-                db.query(queryInsertResponse, [questionId, responseContent.trim()], (err, responseResult) => {
-                    if (err) {
-                        console.error("❌ Erreur SQL lors de l'ajout de la réponse:", err);
-                        res.status(500).send("Erreur serveur");
-                        return;
-                    }
+        let bestTheme = null;
+        let bestScore = 0;
 
-                    console.log(`✅ Réponse ajoutée avec ID ${responseResult.insertId}`);
-                    reponseId = responseResult.insertId;
-
-                    const queryInsertLog = `
-                        INSERT INTO logs_interaction (utilisateur_bis_id, question_bis_id, reponse_id, connaissance_bis_id, horodatage)
-                        VALUES (?, ?, ?, ?, NOW())
-                    `;
-                    db.query(queryInsertLog, [utilisateur_id, questionId, reponseId, bestMatch.id || null], (err) => {
-                        if (err) {
-                            console.error("❌ Erreur SQL lors de l'ajout au log d'interaction:", err);
-                            res.status(500).send("Erreur serveur");
-                            return;
-                        }
-
-                        res.json({
-                            id: questionId,
-                            utilisateur_id,
-                            contenu,
-                            date_question: new Date(),
-                            reponse: responseContent.trim(),
-                            reponse_id: reponseId
-                        });
-                    });
-                });
-            } else {
-                res.json({
-                    id: questionId,
-                    utilisateur_id,
-                    contenu,
-                    date_question: new Date(),
-                    reponse: responseContent.trim(),
-                    reponse_id: reponseId
-                });
+        tfidf.tfidfs(contenu, (i, measure) => {
+            if (measure > bestScore) {
+                bestScore = measure;
+                bestTheme = themes[i];
             }
         });
-    });
+
+        if (!bestTheme) {
+            return res.json({
+                id: null,
+                utilisateur_id,
+                contenu,
+                date_question: new Date(),
+                reponse: "Je n'ai pas pu identifier le thème de votre question.",
+                reponse_id: null,
+            });
+        }
+
+        // Étape 2 : Insérer la question
+        const questionId = await new Promise((resolve, reject) => {
+            db.query("INSERT INTO question (utilisateur_id, contenu, date_question) VALUES (?, ?, NOW())", [utilisateur_id, contenu], (err, result) => {
+                if (err) reject(err);
+                else resolve(result.insertId);
+            });
+        });
+
+        // Étape 3 : Trouver la meilleure réponse dans la base de connaissances
+        const knowledgeResults = await new Promise((resolve, reject) => {
+            db.query("SELECT id, contenu FROM base_connaissance WHERE theme_id = ?", [bestTheme.id], (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        const knowledgeTfidf = new natural.TfIdf();
+        knowledgeResults.forEach((knowledge) => knowledgeTfidf.addDocument(knowledge.contenu));
+
+        let bestMatch = null;
+        let highestScore = 0;
+
+        knowledgeTfidf.tfidfs(contenu, (i, measure) => {
+            if (measure > highestScore) {
+                highestScore = measure;
+                bestMatch = knowledgeResults[i];
+            }
+        });
+
+        let responseContent = "Je n'ai pas trouvé de réponse à votre question.";
+        let reponseId = null;
+
+        if (bestMatch) {
+            responseContent = bestMatch.contenu;
+            reponseId = await new Promise((resolve, reject) => {
+                db.query("INSERT INTO reponse (question_id, contenu, source, date_reponse) VALUES (?, ?, 'base_connaissance', NOW())", [questionId, responseContent.trim()], (err, result) => {
+                    if (err) reject(err);
+                    else resolve(result.insertId);
+                });
+            });
+        }
+
+        // Étape 4 : Enregistrer l'interaction dans les logs
+        await new Promise((resolve, reject) => {
+            db.query(
+                "INSERT INTO logs_interaction (utilisateur_bis_id, question_bis_id, reponse_id, connaissance_bis_id, horodatage) VALUES (?, ?, ?, ?, NOW())",
+                [utilisateur_id, questionId, reponseId, bestMatch ? bestMatch.id : null],
+                (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                }
+            );
+        });
+
+        res.json({
+            id: questionId,
+            utilisateur_id,
+            contenu,
+            date_question: new Date(),
+            reponse: responseContent.trim(),
+            reponse_id: reponseId,
+        });
+    } catch (error) {
+        console.error("Erreur lors du traitement de la question:", error);
+        res.status(500).send("Erreur serveur");
+    }
 });
 
 // Récupérer l'historique des interactions
@@ -395,6 +404,7 @@ app.get("/theme", (req, res) => {
     });
 });
 
+               
 app.post("/theme", (req, res) => {
     const { nom } = req.body;
     const query = "INSERT INTO theme (nom) VALUES (?)";
@@ -441,7 +451,6 @@ app.delete("/theme/:id", (req, res) => {
 // Gestion des contenus
 app.get("/base_connaissance", (req, res) => {
     const { theme_id } = req.query;
-
     let query = "SELECT * FROM base_connaissance";
     const params = [];
 
