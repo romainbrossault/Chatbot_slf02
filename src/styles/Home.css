@@ -171,12 +171,21 @@ body {
 
 .input-form {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
   max-width: 48rem;
   margin: 0 auto;
   background-color: #f3f4f6;
   padding: 0.5rem;
   border-radius: 1.5rem;
+  position: relative; /* Ajouté pour positionner le bouton d'envoi */
+}
+
+.message-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .message-input {
@@ -196,6 +205,8 @@ body {
 }
 
 .send-button {
+  position: absolute; /* Position absolue pour coller le bouton à droite */
+  right: 0.5rem; /* Espacement à droite */
   background-color: #187bcd;
   color: white;
   width: 2rem;

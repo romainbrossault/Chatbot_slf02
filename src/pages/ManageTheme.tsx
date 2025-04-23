@@ -8,6 +8,9 @@ const ManageTheme: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // État pour la pop-up
   const [selectedTheme, setSelectedTheme] = useState<any | null>(null); // Thème sélectionné pour modification
   const [updatedName, setUpdatedName] = useState<string>(''); // Nom mis à jour du thème
+  const [notification, setNotification] = useState<string | null>(null); // Message de notification
+  const [popupMessage, setPopupMessage] = useState<string | null>(null); // Message de notification
+  const [deletePopupMessage, setDeletePopupMessage] = useState<string | null>(null); // Message de notification pour la suppression
 
   useEffect(() => {
     // Fonction pour récupérer les thèmes depuis la base de données
@@ -62,18 +65,16 @@ const ManageTheme: React.FC = () => {
           )
         );
         closeModal();
-        alert('Thème mis à jour avec succès.');
+        setPopupMessage('Thème modifié avec succès.');
       } else {
-        alert('Erreur lors de la mise à jour du thème.');
+        setPopupMessage('Erreur lors de la modification du thème.');
       }
     } catch (err) {
-      alert('Erreur réseau. Veuillez réessayer.');
+      setPopupMessage('Erreur réseau. Veuillez réessayer.');
     }
   };
 
   const handleDeleteTheme = async (themeId: number) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce thème ?')) return;
-
     try {
       const response = await fetch(`http://localhost:5000/theme/${themeId}`, {
         method: 'DELETE',
@@ -82,18 +83,21 @@ const ManageTheme: React.FC = () => {
       if (response.ok) {
         // Supprimer le thème localement
         setThemes((prevThemes) => prevThemes.filter((theme) => theme.id !== themeId));
-        alert('Thème supprimé avec succès.');
+        setDeletePopupMessage('Thème supprimé avec succès.');
       } else {
-        alert('Erreur lors de la suppression du thème.');
+        setDeletePopupMessage('Erreur lors de la suppression du thème.');
       }
     } catch (err) {
-      alert('Erreur réseau. Veuillez réessayer.');
+      setDeletePopupMessage('Erreur réseau. Veuillez réessayer.');
     }
   };
 
   return (
     <div className="manage-theme-container">
       <h1 className="manage-theme-title">Gérer les Thèmes</h1>
+
+      {/* Notification */}
+      {notification && <div className="notification">{notification}</div>}
 
       {loading && <p>Chargement des thèmes...</p>}
       {error && <p className="error-message">{error}</p>}
@@ -120,6 +124,34 @@ const ManageTheme: React.FC = () => {
             </li>
           ))}
         </ul>
+      )}
+
+      {deletePopupMessage && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <p className="popup-message">{deletePopupMessage}</p>
+            <button
+              className="popup-button"
+              onClick={() => setDeletePopupMessage(null)} // Fermer la notification
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {popupMessage && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <p className="popup-message">{popupMessage}</p>
+            <button
+              className="popup-button"
+              onClick={() => setPopupMessage(null)} // Fermer la notification
+            >
+              OK
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Pop-up modale */}

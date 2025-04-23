@@ -36,76 +36,78 @@ const Navbar: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="dropdown">
-            <button
-              onClick={toggleDropdown}
-              className="dropdown-button"
-            >
-              <User className="dropdown-icon" />
-              <span>Menu</span>
-              <ChevronDown className="chevron-icon" />
-            </button>
-            {isDropdownOpen && (
-              <div className="dropdown-menu">
-                {user ? (
-                  <>
-                    <Link
-                      to="/account"
-                      className="dropdown-item"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <User className="dropdown-item-icon" />
-                      Mon Compte
-                    </Link>
-                    <Link
-                      to="/admin-knowledge"
-                      className="dropdown-item"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <Database className="dropdown-item-icon" />
-                      Ajouter Connaissance
-                    </Link>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setIsDropdownOpen(false);
-                      }}
-                      className="dropdown-item"
-                    >
-                      <LogOut className="dropdown-item-icon" />
-                      Se déconnecter
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="dropdown-item"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <User className="dropdown-item-icon" />
-                      Connexion
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="dropdown-item"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <User className="dropdown-item-icon" />
-                      Créer un compte
-                    </Link>
-                  </>
-                )}
-                <Link
-                  to="/guide"
-                  className="dropdown-item"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  <BookOpen className="dropdown-item-icon" />
-                  Guide d'utilisateur
-                </Link>
-              </div>
-            )}
+          <div className="navbar-right">
+            <div className="dropdown">
+              <button
+                onClick={toggleDropdown}
+                className="dropdown-button"
+              >
+                <User className="dropdown-icon" />
+                <span>Menu</span>
+                <ChevronDown className="chevron-icon" />
+              </button>
+              {isDropdownOpen && (
+                <div className="dropdown-menu">
+                  {user ? (
+                    <>
+                      <Link
+                        to="/account"
+                        className="dropdown-item"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <User className="dropdown-item-icon" />
+                        Mon Compte
+                      </Link>
+                      <Link
+                        to="/admin-knowledge"
+                        className="dropdown-item"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <Database className="dropdown-item-icon" />
+                        Ajouter Connaissance
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsDropdownOpen(false);
+                        }}
+                        className="dropdown-item"
+                      >
+                        <LogOut className="dropdown-item-icon" />
+                        Se déconnecter
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        className="dropdown-item"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <User className="dropdown-item-icon" />
+                        Connexion
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="dropdown-item"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <User className="dropdown-item-icon" />
+                        Créer un compte
+                      </Link>
+                    </>
+                  )}
+                  <Link
+                    to="/guide"
+                    className="dropdown-item"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <BookOpen className="dropdown-item-icon" />
+                    Guide d'utilisateur
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

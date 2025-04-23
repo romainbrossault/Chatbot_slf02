@@ -15,6 +15,7 @@ interface Message {
 
 const Home: React.FC = () => {
   const [input, setInput] = useState('');
+  const [isPasswordTest, setIsPasswordTest] = useState(false); // État pour savoir si le test de mot de passe est activé
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<number | null>(null); // Identifiant de conversation
   const { user } = useContext(UserContext);
@@ -33,22 +34,23 @@ const Home: React.FC = () => {
 
     const userMessage: Message = {
       id: Date.now(),
-      text: input,
+      text: isPasswordTest ? `Tester mon mot de passe : ${input}` : input,
       isUser: true,
     };
 
     setMessages([...messages, userMessage]);
     setInput('');
+    setIsPasswordTest(false); // Réinitialiser l'état après l'envoi
 
     try {
-      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: input });
+      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: userMessage.text });
 
       const response = await fetch('http://localhost:5000/question', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           utilisateur_id: user.id,
-          contenu: input,
+          contenu: userMessage.text,
           conversation_id: conversationId, // Inclure l'identifiant de conversation
         }),
       });
@@ -91,7 +93,8 @@ const Home: React.FC = () => {
   };
 
   const handleTestPassword = () => {
-    setInput("Tester mon mot de passe : ");
+    setIsPasswordTest(true);
+    setInput(''); // Réinitialiser l'entrée utilisateur
   };
 
   useEffect(() => {
@@ -141,13 +144,16 @@ const Home: React.FC = () => {
               <Key className="h-5 w-5" />
               Tester MDP
             </button>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Posez votre question ici..."
-              className="message-input"
-            />
+            <div className="message-input-wrapper">
+              {isPasswordTest && <span className="fixed-text">Tester mon mot de passe : </span>}
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={isPasswordTest ? '' : 'Posez votre question ici...'}
+                className="message-input"
+              />
+            </div>
             <button type="submit" className="send-button">
               <Send className="h-5 w-5" />
             </button>
@@ -158,4 +164,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home; 
+export default Home;

@@ -29,27 +29,7 @@ const UserGuide: React.FC = () => {
           </div>
         </section>
         
-        <section className="guide-section">
-          <div className="section-header">
-            <User className="section-icon" />
-            <h2 className="section-title">Gestion de compte</h2>
-          </div>
-          <div className="section-content">
-            <p>
-              Pour profiter pleinement de notre service, nous vous recommandons de créer un compte:
-            </p>
-            <ol className="guide-list ordered-list">
-              <li>Cliquez sur "Menu" dans la barre de navigation, puis sélectionnez "Connexion".</li>
-              <li>Si vous n'avez pas encore de compte, cliquez sur "Créer un compte".</li>
-              <li>Remplissez le formulaire avec vos informations.</li>
-              <li>Créez un mot de passe sécurisé.</li>
-              <li>Cliquez sur "Créer un compte" pour finaliser votre inscription.</li>
-            </ol>
-            <p>
-              Une fois connecté, vous pourrez accéder à l'historique de vos conversations et à d'autres fonctionnalités exclusives.
-            </p>
-          </div>
-        </section>
+        
         
         <section className="guide-section">
           <div className="section-header">

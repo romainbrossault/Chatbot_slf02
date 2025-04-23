@@ -9,6 +9,9 @@ const AdminKnowledge: React.FC = () => {
   const [notification, setNotification] = useState<string | null>(null);
   const [searchThemeId, setSearchThemeId] = useState<number | null>(null); // ID du thème pour la recherche
   const [knowledgeList, setKnowledgeList] = useState<any[]>([]); // Liste des contenus
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // État pour la pop-up
+  const [newThemeName, setNewThemeName] = useState(''); // Nom du nouveau thème
+  const [popupMessage, setPopupMessage] = useState<string | null>(null); // Message de confirmation dans la pop-up
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,42 +49,32 @@ const AdminKnowledge: React.FC = () => {
     fetchKnowledge();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!selectedThemeId) {
-      setNotification('Veuillez sélectionner un thème.');
-      setTimeout(() => setNotification(null), 5000);
+  const handleAddTheme = async () => {
+    if (!newThemeName.trim()) {
+      setPopupMessage('Veuillez entrer un nom de thème.');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/base_connaissance', {
+      const response = await fetch('http://localhost:5000/theme', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          theme_id: selectedThemeId,
-          contenu,
-        }),
+        body: JSON.stringify({ nom: newThemeName }),
       });
 
       if (response.ok) {
-        console.log('✅ Connaissance ajoutée avec succès');
-        setSelectedThemeId(null);
-        setContenu('');
-        setNotification('Connaissance ajoutée avec succès !');
-        setTimeout(() => setNotification(null), 5000);
+        const newTheme = await response.json();
+        setThemes((prevThemes) => [...prevThemes, newTheme]);
+        setNewThemeName('');
+        setPopupMessage('Thème ajouté avec succès.');
       } else {
-        console.error('❌ Échec de l’ajout de la connaissance');
-        setNotification('Échec de l’ajout de la connaissance.');
-        setTimeout(() => setNotification(null), 8000);
+        setPopupMessage('Erreur lors de l’ajout du thème.');
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l’ajout de la connaissance:', error);
-      setNotification('Erreur réseau. Veuillez réessayer.');
-      setTimeout(() => setNotification(null), 8000);
+      console.error('Erreur réseau lors de l’ajout du thème:', error);
+      setPopupMessage('Erreur réseau. Veuillez réessayer.');
     }
   };
 
@@ -99,7 +92,9 @@ const AdminKnowledge: React.FC = () => {
       <div className="admin-knowledge-grid">
         {/* Bloc d'ajout de thème */}
         <div className="theme-block">
-          <h2>Ajouter un Thème</h2>
+          <button className="add-theme-button" onClick={() => setIsPopupOpen(true)}>
+            Ajouter un Thème
+          </button>
           <button
             onClick={() => navigate('/manage-theme')} // Redirection vers la page "ManageTheme"
             className="manage-theme-button"
@@ -108,12 +103,58 @@ const AdminKnowledge: React.FC = () => {
           </button>
         </div>
 
+        {/* Pop-up pour ajouter un thème */}
+        {isPopupOpen && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <h2>Ajouter un Thème</h2>
+              <input
+                type="text"
+                value={newThemeName}
+                onChange={(e) => setNewThemeName(e.target.value)}
+                placeholder="Nom du thème"
+                className="popup-input"
+              />
+              <div className="popup-actions">
+                <button className="popup-button" onClick={handleAddTheme}>
+                  Ajouter
+                </button>
+                <button
+                  className="popup-button cancel"
+                  onClick={() => {
+                    setIsPopupOpen(false);
+                    setPopupMessage(null); // Réinitialiser le message
+                  }}
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {popupMessage && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <p className="popup-message">{popupMessage}</p>
+              <button
+                className="popup-button"
+                onClick={() => setPopupMessage(null)} // Fermer la notification
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
+
+        
+
         {/* Bloc d'ajout de contenu */}
         <div className="content-block">
           <h2>Ajouter un Contenu</h2>
-          <form onSubmit={handleSubmit} className="admin-knowledge-form">
+          <form onSubmit={(e) => e.preventDefault()} className="admin-knowledge-form">
             <div className="form-group">
-              <label htmlFor="theme">Thème</label>
+              <label htmlFor="theme">Thèmes :</label>
               <select
                 id="theme"
                 value={selectedThemeId || ''}
@@ -129,7 +170,7 @@ const AdminKnowledge: React.FC = () => {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="contenu">Contenu</label>
+              <label htmlFor="contenu">Contenu :</label>
               <textarea
                 id="contenu"
                 value={contenu}
