@@ -1,9 +1,8 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Send, ThumbsUp, ThumbsDown, Key } from 'lucide-react';
-import '../styles/Home.css';
+import { Send, Key } from 'lucide-react';
+import '../styles/Home.css'; // Ton CSS mis à jour
 import { UserContext } from '../context/UserContext';
-
 import logo from '../img/logo02.svg';
 
 interface Message {
@@ -11,69 +10,74 @@ interface Message {
   text: string;
   isUser: boolean;
   reponseId?: number;
+  suggestions?: string[];
+  showSuggestions?: boolean;
 }
 
 const Home: React.FC = () => {
   const [input, setInput] = useState('');
-  const [isPasswordTest, setIsPasswordTest] = useState(false); // État pour savoir si le test de mot de passe est activé
+  const [isPasswordTest, setIsPasswordTest] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [conversationId, setConversationId] = useState<number | null>(null); // Identifiant de conversation
+  const [conversationId, setConversationId] = useState<number | null>(null);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
 
-  console.log("Utilisateur connecté:", user); // Debug
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent, question?: string) => {
+    if (e) e.preventDefault();
     if (!user) {
       navigate('/login');
       return;
     }
-    if (input.trim() === '') return;
+
+    const questionText = question || input.trim();
+    if (questionText === '') return;
 
     const userMessage: Message = {
       id: Date.now(),
-      text: isPasswordTest ? `Tester mon mot de passe : ${input}` : input,
+      text: isPasswordTest ? `Tester mon mot de passe : ${questionText}` : questionText,
       isUser: true,
     };
 
     setMessages([...messages, userMessage]);
     setInput('');
-    setIsPasswordTest(false); // Réinitialiser l'état après l'envoi
+    setIsPasswordTest(false);
 
     try {
-      console.log('Envoi de la question:', { utilisateur_id: user.id, contenu: userMessage.text });
-
       const response = await fetch('http://localhost:5000/question', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           utilisateur_id: user.id,
           contenu: userMessage.text,
-          conversation_id: conversationId, // Inclure l'identifiant de conversation
+          conversation_id: conversationId,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Question traitée avec succès:', data);
+
+        const uniqueSuggestions = Array.from(
+          new Set(data.suggestions.map((s: string) => s.toLowerCase()))
+        ).filter(
+          (suggestion, index, self) =>
+            self.findIndex((s) => s.includes(suggestion) || suggestion.includes(s)) === index
+        );
 
         const aiMessage: Message = {
           id: Date.now() + 1,
           text: data.reponse || "Je n'ai pas trouvé de réponse à votre question.",
           isUser: false,
           reponseId: data.reponse_id,
+          suggestions: uniqueSuggestions,
+          showSuggestions: false,
         };
         setMessages((prev) => [...prev, aiMessage]);
 
-        // Si c'est le premier message, définir l'identifiant de conversation
         if (!conversationId) {
           setConversationId(data.conversation_id);
         }
       } else {
-        const errorData = await response.json();
-        console.error('❌ Erreur lors de l’ajout de la question:', errorData);
         const aiMessage: Message = {
           id: Date.now() + 1,
           text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
@@ -82,7 +86,6 @@ const Home: React.FC = () => {
         setMessages((prev) => [...prev, aiMessage]);
       }
     } catch (error) {
-      console.error('❌ Erreur réseau:', error);
       const aiMessage: Message = {
         id: Date.now() + 1,
         text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
@@ -92,9 +95,21 @@ const Home: React.FC = () => {
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    handleSubmit(undefined, suggestion);
+  };
+
+  const toggleSuggestions = (index: number) => {
+    setMessages((prevMessages) =>
+      prevMessages.map((message, i) =>
+        i === index ? { ...message, showSuggestions: !message.showSuggestions } : message
+      )
+    );
+  };
+
   const handleTestPassword = () => {
     setIsPasswordTest(true);
-    setInput(''); // Réinitialiser l'entrée utilisateur
+    setInput('');
   };
 
   useEffect(() => {
@@ -122,17 +137,56 @@ const Home: React.FC = () => {
           </div>
         ) : (
           <div className="messages-container">
-            {messages.map((message) => (
-              <div key={message.id} className={`message-wrapper ${message.isUser ? 'user-message-wrapper' : 'ai-message-wrapper'}`}>
-                {!message.isUser && <img src={logo} alt="Logo" className="ai-logo" />}
-                <div className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}>
-                  {message.text}
-                </div>
+            {messages.map((message, index) => (
+              <div
+                key={message.id}
+                className={`message-wrapper ${message.isUser ? 'user-message-wrapper' : 'ai-message-wrapper'}`}
+              >
+                {!message.isUser && (
+                  <div className="ai-message-full">
+                    <img src={logo} alt="Logo" className="ai-logo" />
+                    <div className="message ai-message">
+                      {message.text}
+                    </div>
+
+                    {message.suggestions && message.suggestions.length > 0 && (
+                      <div className="suggestions-container">
+                        <button
+                          className="suggestions-button"
+                          onClick={() => toggleSuggestions(index)}
+                        >
+                          {message.showSuggestions ? 'Masquer suggestions' : 'Voir suggestions'}
+                        </button>
+
+                        {message.showSuggestions && (
+                          <div className="suggestions-list">
+                            {message.suggestions.map((suggestion, suggestionIndex) => (
+                              <div
+                                key={suggestionIndex}
+                                className="suggestion-item"
+                                onClick={() => handleSuggestionClick(suggestion)}
+                              >
+                                {suggestion}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {message.isUser && (
+                  <div className="message user-message">
+                    {message.text}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
       {user && (
         <div className="input-area">
           <form onSubmit={handleSubmit} className="input-form">

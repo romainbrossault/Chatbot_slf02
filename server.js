@@ -255,6 +255,7 @@ app.post("/question", async (req, res) => {
                     ? "Voici quelques conseils pour l'améliorer :\n- " + analysis.recommendations.join("\n- ")
                     : "Votre mot de passe est fort. Bien joué !"),
             reponse_id: null,
+            theme: null, // Pas de thème pour les tests de mot de passe
         });
     }
 
@@ -288,6 +289,7 @@ app.post("/question", async (req, res) => {
                 date_question: new Date(),
                 reponse: "Je n'ai pas pu identifier le thème de votre question.",
                 reponse_id: null,
+                theme: null, // Pas de thème identifié
             });
         }
 
@@ -345,6 +347,19 @@ app.post("/question", async (req, res) => {
             );
         });
 
+        // Étape 5 : Générer des suggestions de nouvelles questions
+        const generateSuggestions = (question) => {
+            const keywords = question.split(" ").slice(0, 3); // Extraire les 3 premiers mots-clés
+            return [
+                `Pouvez-vous expliquer ${keywords.join(" ")} en détail ?`,
+                `Quels sont les avantages de ${keywords.join(" ")} ?`,
+                `Comment fonctionne ${keywords.join(" ")} ?`,
+            ];
+        };
+
+        const suggestions = generateSuggestions(contenu);
+
+        // Étape 6 : Répondre avec les suggestions et le thème
         res.json({
             id: questionId,
             utilisateur_id,
@@ -352,7 +367,10 @@ app.post("/question", async (req, res) => {
             date_question: new Date(),
             reponse: responseContent.trim(),
             reponse_id: reponseId,
+            theme: bestTheme.nom, // Inclure le thème identifié
+            suggestions, // Ajouter les suggestions à la réponse
         });
+
     } catch (error) {
         console.error("Erreur lors du traitement de la question:", error);
         res.status(500).send("Erreur serveur");
