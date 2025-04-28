@@ -264,7 +264,6 @@ function analyzePassword(password) {
 }
 
 // Route pour gérer les questions
-
 app.post("/question", async (req, res) => {
     const { utilisateur_id, contenu } = req.body;
 
@@ -301,18 +300,17 @@ app.post("/question", async (req, res) => {
             });
         });
 
-        const tfidf = new natural.TfIdf();
-        themes.forEach((theme) => tfidf.addDocument(theme.nom));
-
         let bestTheme = null;
-        let bestScore = 0;
+        let bestSimilarity = 0;
+        const similarityThreshold = 0.7;
 
-        tfidf.tfidfs(contenu, (i, measure) => {
-            if (measure > bestScore) {
-                bestScore = measure;
-                bestTheme = themes[i];
+        for (const theme of themes) {
+            const similarity = natural.JaroWinklerDistance(contenu.toLowerCase(), theme.nom.toLowerCase());
+            if (similarity > bestSimilarity && similarity >= similarityThreshold) {
+                bestSimilarity = similarity;
+                bestTheme = theme;
             }
-        });
+        }
 
         if (!bestTheme) {
             return res.json({
@@ -342,18 +340,16 @@ app.post("/question", async (req, res) => {
             });
         });
 
-        const knowledgeTfidf = new natural.TfIdf();
-        knowledgeResults.forEach((knowledge) => knowledgeTfidf.addDocument(knowledge.contenu));
-
         let bestMatch = null;
         let highestScore = 0;
 
-        knowledgeTfidf.tfidfs(contenu, (i, measure) => {
-            if (measure > highestScore) {
-                highestScore = measure;
-                bestMatch = knowledgeResults[i];
+        for (const result of knowledgeResults) {
+            const similarity = natural.JaroWinklerDistance(contenu.toLowerCase(), result.contenu.toLowerCase());
+            if (similarity > highestScore) {
+                highestScore = similarity;
+                bestMatch = result;
             }
-        });
+        }
 
         let responseContent = "Je n'ai pas trouvé de réponse à votre question.";
         let reponseId = null;
@@ -409,6 +405,7 @@ app.post("/question", async (req, res) => {
         res.status(500).send("Erreur serveur");
     }
 });
+
 
 // Récupérer l'historique des interactions
 app.get("/logs_interaction", (req, res) => {
@@ -536,5 +533,9 @@ app.post("/base_connaissance", (req, res) => {
 });
 
 app.listen(PORT, () => {
+<<<<<<< HEAD
+    console.log(`🚀 Serveur démarré sur ${PORT}`);
+=======
     console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
+>>>>>>> parent of 083afbb (edit)
 });
