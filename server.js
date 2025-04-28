@@ -533,9 +533,5 @@ app.post("/base_connaissance", (req, res) => {
 });
 
 app.listen(PORT, () => {
-<<<<<<< HEAD
-    console.log(`🚀 Serveur démarré sur ${PORT}`);
-=======
     console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
->>>>>>> parent of 083afbb (edit)
 });
