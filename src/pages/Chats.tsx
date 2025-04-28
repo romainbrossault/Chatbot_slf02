@@ -45,20 +45,20 @@ const Chats: React.FC = () => {
   // Fonction pour supprimer une question et sa réponse
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:5000/question/${id}`, {
-        method: 'DELETE',
-      });
+        const response = await fetch(`http://localhost:5000/chats/${id}`, {
+            method: 'DELETE',
+        });
 
-      if (response.ok) {
-        setChatLogs(chatLogs.filter((log) => log.id !== id));
-        console.log(`Question avec ID ${id} supprimée avec succès.`);
-      } else {
-        console.error("Erreur lors de la suppression de la question.");
-      }
+        if (response.ok) {
+            setChatLogs(chatLogs.filter((log) => log.id !== id));
+            console.log(`Question avec ID ${id} supprimée avec succès.`);
+        } else {
+            console.error("Erreur lors de la suppression de la question.");
+        }
     } catch (error) {
-      console.error("Erreur réseau lors de la suppression de la question:", error);
+        console.error("Erreur réseau lors de la suppression de la question:", error);
     }
-  };
+};
 
   // Filtrer les logs en fonction du terme de recherche
   const filteredLogs = chatLogs.filter((log) =>

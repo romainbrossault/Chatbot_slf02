@@ -153,6 +153,39 @@ app.delete("/question/:id", (req, res) => {
     });
 });
 
+app.delete("/chats/:id", (req, res) => {
+    const { id } = req.params;
+
+    // Supprimer l'interaction associée
+    const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
+    db.query(deleteInteractionQuery, [id], (err) => {
+        if (err) {
+            console.error("Erreur SQL lors de la suppression de l'interaction:", err);
+            return res.status(500).send("Erreur serveur lors de la suppression de l'interaction.");
+        }
+
+        // Supprimer la réponse associée
+        const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
+        db.query(deleteResponseQuery, [id], (err) => {
+            if (err) {
+                console.error("Erreur SQL lors de la suppression de la réponse:", err);
+                return res.status(500).send("Erreur serveur lors de la suppression de la réponse.");
+            }
+
+            // Supprimer la question
+            const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
+            db.query(deleteQuestionQuery, [id], (err) => {
+                if (err) {
+                    console.error("Erreur SQL lors de la suppression de la question:", err);
+                    return res.status(500).send("Erreur serveur lors de la suppression de la question.");
+                }
+
+                res.json({ message: "Question et réponse associées supprimées avec succès", id });
+            });
+        });
+    });
+});
+
 // Récupérer toutes les réponses
 app.get("/reponse", (req, res) => {
     db.query("SELECT * FROM reponse", (err, results) => {
