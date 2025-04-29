@@ -527,6 +527,21 @@ app.delete("/ticket/:id", (req, res) => {
     });
 });
 
+app.put("/ticket/:id", (req, res) => {
+    const { id } = req.params;
+    const { statut } = req.body;
+    const query = "UPDATE ticket SET statut = ? WHERE id = ?";
+  
+    db.query(query, [statut, id], (err, result) => {
+      if (err) {
+        console.error("Erreur SQL:", err);
+        res.status(500).send("Erreur serveur");
+        return;
+      }
+      res.json({ message: "Statut du ticket mis à jour avec succès", id });
+    });
+  });
+
 app.listen(PORT, () => {
     console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
 });

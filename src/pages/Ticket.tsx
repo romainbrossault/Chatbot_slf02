@@ -117,25 +117,28 @@ const Ticket: React.FC = () => {
           ) : (
             <div className="ticket-list">
               {tickets.map((ticket) => (
-                <div key={ticket.id} className="ticket-item">
-                  <h2 className="ticket-item-title">{ticket.titre}</h2>
-                  <p className="ticket-item-description">{ticket.description}</p>
-                  <p className="ticket-item-category">
-                    <strong>Catégorie :</strong> {ticket.categorie}
-                  </p>
-                  <p className="ticket-item-urgency">
-                    <strong>Niveau d'Urgence :</strong> {ticket.niveau_urgence}
-                  </p>
-                  <p className={`ticket-item-status status-${ticket.statut}`}>
-                    <strong>Statut :</strong> {ticket.statut === 0 ? 'Non Ouvert' : 'Fermé'}
-                  </p>
-                  <button
-                    className="delete-button"
-                    onClick={() => handleDelete(ticket.id)}
-                  >
-                    Supprimer
-                  </button>
-                </div>
+                <div
+                key={ticket.id}
+                className={`ticket-item status-${ticket.statut}`} // Classe dynamique basée sur le statut
+              >
+                <h2 className="ticket-item-title">{ticket.titre}</h2>
+                <p className="ticket-item-description">{ticket.description}</p>
+                <p className="ticket-item-category">
+                  <strong>Catégorie :</strong> {ticket.categorie}
+                </p>
+                <p className="ticket-item-urgency">
+                  <strong>Niveau d'Urgence :</strong> {ticket.niveau_urgence}
+                </p>
+                <p className={`ticket-item-status status-${ticket.statut}`}>
+                  <strong>Statut :</strong> {ticket.statut === 0 ? 'Non Résolu' : 'Résolu'}
+                </p>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDelete(ticket.id)}
+                >
+                  Supprimer
+                </button>
+              </div>
               ))}
               <button
                 className="create-ticket-button"

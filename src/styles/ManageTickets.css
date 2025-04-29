@@ -33,9 +33,9 @@
   }
   
   .tickets-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 tickets par ligne */
+    gap: 1rem; /* Espacement entre les tickets */
   }
   
   .ticket-item {
@@ -43,19 +43,46 @@
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
     background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 200px; /* Hauteur fixe pour un format carré */
+    text-align: center;
   }
   
   .ticket-title {
     font-size: 1.25rem;
     font-weight: bold;
+    margin-bottom: 0.5rem;
   }
   
   .ticket-description {
-    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   .ticket-category,
   .ticket-urgency,
+  .ticket-user,
   .ticket-status {
     font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .resolve-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #187bcd;
+  }
+  
+  .resolve-label input {
+    cursor: pointer;
   }
