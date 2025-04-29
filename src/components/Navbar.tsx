@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, MessageSquare, ChevronDown, User, BookOpen, LogOut, Database } from 'lucide-react';
+import { Home, MessageSquare, User, BookOpen, Database, LogOut, ChevronDown, Ticket } from 'lucide-react';
 import '../styles/Navbar.css';
 import { UserContext } from '../context/UserContext';
 
@@ -29,10 +29,16 @@ const Navbar: React.FC = () => {
                 Accueil
               </Link>
               {user && (
-                <Link to="/chats" className="navbar-link">
-                  <MessageSquare className="link-icon" />
-                  Mes Questions
-                </Link>
+                <>
+                  <Link to="/chats" className="navbar-link">
+                    <MessageSquare className="link-icon" />
+                    Mes Questions
+                  </Link>
+                  <Link to="/ticket" className="navbar-link"> {/* Bouton Tickets */}
+                    <Ticket className="link-icon" />
+                    Ticket
+                  </Link>
+                </>
               )}
             </div>
           </div>

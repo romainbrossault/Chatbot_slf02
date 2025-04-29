@@ -1,0 +1,167 @@
+.ticket-container {
+    max-width: 40rem;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-title {
+    font-size: 1.875rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.success-message {
+    color: #16a34a;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.ticket-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Réduit l'espacement entre les champs */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 1.125rem; /* Augmente la taille du texte */
+    font-weight: 600; /* Met le texte en gras */
+    margin-bottom: 0.5rem; /* Ajoute un peu d'espacement entre le label et le champ */
+}
+
+/* Styles spécifiques pour les champs input */
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    width: 50%; /* Assure une taille uniforme */
+    box-sizing: border-box;
+}
+
+/* Styles spécifiques pour les champs textarea */
+.form-group textarea {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    width: 100%; /* Assure une taille uniforme */
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 6rem;
+}
+
+/* Styles spécifiques pour les champs select */
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    width: 50%; /* Assure une taille uniforme */
+    box-sizing: border-box;
+}
+
+.submit-button {
+    padding: 0.75rem 1rem;
+    background-color: #187bcd;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #1d4ed8;
+}
+
+.no-tickets {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .create-ticket-button {
+    margin-top: 2rem;
+    background-color: #187bcd;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 50%;
+    height: 50px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-ticket-button:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .ticket-item {
+    padding: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: #f9f9f9;
+  }
+  
+  .ticket-item-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .ticket-item-description {
+    margin: 0.5rem 0;
+  }
+  
+  .ticket-item-category,
+  .ticket-item-urgency,
+  .ticket-item-status {
+    font-size: 0.875rem;
+  }
+  
+  .status-envoyé {
+    color: #2563eb;
+  }
+  
+  .status-en-cours {
+    color: #f59e0b;
+  }
+  
+  .status-résolu {
+    color: #16a34a;
+  }
+  
+  .cancel-button {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cancel-button:hover {
+    background-color: #dc2626;
+  }

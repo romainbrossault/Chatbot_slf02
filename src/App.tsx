@@ -10,6 +10,7 @@ import UserGuide from './pages/UserGuide';
 import Account from './pages/Account';
 import ManageTheme from './pages/ManageTheme';
 import AdminKnowledge from './pages/AdminKnowledge';
+import Ticket from './pages/Ticket';
 import { UserProvider } from './context/UserContext';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
               <Route path="/account" element={<Account />} />
               <Route path="/admin-knowledge" element={<AdminKnowledge />} />
               <Route path="/manage-theme" element={<ManageTheme />} />
+              <Route path="/ticket" element={<Ticket />} />
             </Routes>
           </div>
         </div>
