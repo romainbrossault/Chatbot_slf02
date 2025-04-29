@@ -74,6 +74,35 @@ app.post("/utilisateur", (req, res) => {
     });
 });
 
+app.delete("/utilisateur/:id", (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM utilisateur WHERE id = ?";
+  
+    db.query(query, [id], (err, result) => {
+      if (err) {
+        console.error("Erreur SQL lors de la suppression de l'utilisateur:", err);
+        res.status(500).send("Erreur serveur");
+        return;
+      }
+      res.json({ message: "Utilisateur supprimé avec succès", id });
+    });
+  });
+  
+  app.put("/utilisateur/:id", (req, res) => {
+    const { id } = req.params;
+    const { nom, prenom, email, role } = req.body;
+    const query = "UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id = ?";
+  
+    db.query(query, [nom, prenom, email, role, id], (err, result) => {
+      if (err) {
+        console.error("Erreur SQL lors de la mise à jour de l'utilisateur:", err);
+        res.status(500).send("Erreur serveur");
+        return;
+      }
+      res.json({ message: "Utilisateur mis à jour avec succès", id });
+    });
+  });
+
 // Valider une réponse
 app.post("/reponse/valider", (req, res) => {
     const { reponse_id } = req.body;

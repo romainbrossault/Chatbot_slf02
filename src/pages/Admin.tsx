@@ -1,10 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { UserContext } from '../context/UserContext';
 import '../styles/Admin.css';
 
 const Admin: React.FC = () => {
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user || user.role !== 'administrateur') {
+      navigate('/'); 
+    }
+  }, [user, navigate]);
 
   return (
     <motion.div
@@ -42,6 +50,14 @@ const Admin: React.FC = () => {
           onClick={() => navigate('/manage-tickets')}
         >
           Gestion Tickets
+        </motion.button>
+        <motion.button
+          className="admin-button"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/manage-users')}
+        >
+          Gestion Utilisateur
         </motion.button>
       </motion.div>
     </motion.div>

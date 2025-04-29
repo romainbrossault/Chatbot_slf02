@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
                         <User className="dropdown-item-icon" />
                         Mon Compte
                       </Link>
-                      {user.email === 'admin@chatbot.fr' && (
+                      {user.role === 'admin' && (
                         <Link
                           to="/admin"
                           className="dropdown-item"
