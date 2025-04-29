@@ -1,7 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Send, Key } from 'lucide-react';
-import '../styles/Home.css'; // Ton CSS mis à jour
+import '../styles/Home.css';
 import { UserContext } from '../context/UserContext';
 import logo from '../img/logo02.svg';
 
@@ -9,9 +9,6 @@ interface Message {
   id: number;
   text: string;
   isUser: boolean;
-  reponseId?: number;
-  suggestions?: string[];
-  showSuggestions?: boolean;
 }
 
 const Home: React.FC = () => {
@@ -57,20 +54,10 @@ const Home: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        const uniqueSuggestions = Array.from(
-          new Set(data.suggestions.map((s: string) => s.toLowerCase()))
-        ).filter(
-          (suggestion, index, self) =>
-            self.findIndex((s) => s.includes(suggestion) || suggestion.includes(s)) === index
-        );
-
         const aiMessage: Message = {
           id: Date.now() + 1,
           text: data.reponse || "Je n'ai pas trouvé de réponse à votre question.",
           isUser: false,
-          reponseId: data.reponse_id,
-          suggestions: uniqueSuggestions,
-          showSuggestions: false,
         };
         setMessages((prev) => [...prev, aiMessage]);
 
@@ -93,18 +80,6 @@ const Home: React.FC = () => {
       };
       setMessages((prev) => [...prev, aiMessage]);
     }
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    handleSubmit(undefined, suggestion);
-  };
-
-  const toggleSuggestions = (index: number) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message, i) =>
-        i === index ? { ...message, showSuggestions: !message.showSuggestions } : message
-      )
-    );
   };
 
   const handleTestPassword = () => {
@@ -137,7 +112,7 @@ const Home: React.FC = () => {
           </div>
         ) : (
           <div className="messages-container">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
                 key={message.id}
                 className={`message-wrapper ${message.isUser ? 'user-message-wrapper' : 'ai-message-wrapper'}`}
@@ -148,31 +123,6 @@ const Home: React.FC = () => {
                     <div className="message ai-message">
                       {message.text}
                     </div>
-
-                    {message.suggestions && message.suggestions.length > 0 && (
-                      <div className="suggestions-container">
-                        <button
-                          className="suggestions-button"
-                          onClick={() => toggleSuggestions(index)}
-                        >
-                          {message.showSuggestions ? 'Masquer suggestions' : 'Voir suggestions'}
-                        </button>
-
-                        {message.showSuggestions && (
-                          <div className="suggestions-list">
-                            {message.suggestions.map((suggestion, suggestionIndex) => (
-                              <div
-                                key={suggestionIndex}
-                                className="suggestion-item"
-                                onClick={() => handleSuggestionClick(suggestion)}
-                              >
-                                {suggestion}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 )}
 

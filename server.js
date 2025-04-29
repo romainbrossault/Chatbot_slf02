@@ -153,39 +153,6 @@ app.delete("/question/:id", (req, res) => {
     });
 });
 
-app.delete("/chats/:id", (req, res) => {
-    const { id } = req.params;
-
-    // Supprimer l'interaction associée
-    const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
-    db.query(deleteInteractionQuery, [id], (err) => {
-        if (err) {
-            console.error("Erreur SQL lors de la suppression de l'interaction:", err);
-            return res.status(500).send("Erreur serveur lors de la suppression de l'interaction.");
-        }
-
-        // Supprimer la réponse associée
-        const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
-        db.query(deleteResponseQuery, [id], (err) => {
-            if (err) {
-                console.error("Erreur SQL lors de la suppression de la réponse:", err);
-                return res.status(500).send("Erreur serveur lors de la suppression de la réponse.");
-            }
-
-            // Supprimer la question
-            const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
-            db.query(deleteQuestionQuery, [id], (err) => {
-                if (err) {
-                    console.error("Erreur SQL lors de la suppression de la question:", err);
-                    return res.status(500).send("Erreur serveur lors de la suppression de la question.");
-                }
-
-                res.json({ message: "Question et réponse associées supprimées avec succès", id });
-            });
-        });
-    });
-});
-
 // Récupérer toutes les réponses
 app.get("/reponse", (req, res) => {
     db.query("SELECT * FROM reponse", (err, results) => {
@@ -247,7 +214,7 @@ function analyzePassword(password) {
         recommendations.push("Ajoutez des chiffres pour renforcer votre mot de passe.");
     }
 
-    if (/[\W_]/.test(password)) {   
+    if (/[\W_]/.test(password)) {
         score += 1;
     } else {
         recommendations.push("Ajoutez des caractères spéciaux (par exemple, @, #, $, %, etc.) pour renforcer votre mot de passe.");
@@ -264,6 +231,7 @@ function analyzePassword(password) {
 }
 
 // Route pour gérer les questions
+
 app.post("/question", async (req, res) => {
     const { utilisateur_id, contenu } = req.body;
 
@@ -287,7 +255,6 @@ app.post("/question", async (req, res) => {
                     ? "Voici quelques conseils pour l'améliorer :\n- " + analysis.recommendations.join("\n- ")
                     : "Votre mot de passe est fort. Bien joué !"),
             reponse_id: null,
-            theme: null, // Pas de thème pour les tests de mot de passe
         });
     }
 
@@ -321,7 +288,6 @@ app.post("/question", async (req, res) => {
                 date_question: new Date(),
                 reponse: "Je n'ai pas pu identifier le thème de votre question.",
                 reponse_id: null,
-                theme: null, // Pas de thème identifié
             });
         }
 
@@ -379,19 +345,6 @@ app.post("/question", async (req, res) => {
             );
         });
 
-        // Étape 5 : Générer des suggestions de nouvelles questions
-        const generateSuggestions = (question) => {
-            const keywords = question.split(" ").slice(0, 3); // Extraire les 3 premiers mots-clés
-            return [
-                `Pouvez-vous expliquer ${keywords.join(" ")} en détail ?`,
-                `Quels sont les avantages de ${keywords.join(" ")} ?`,
-                `Comment fonctionne ${keywords.join(" ")} ?`,
-            ];
-        };
-
-        const suggestions = generateSuggestions(contenu);
-
-        // Étape 6 : Répondre avec les suggestions et le thème
         res.json({
             id: questionId,
             utilisateur_id,
@@ -399,10 +352,7 @@ app.post("/question", async (req, res) => {
             date_question: new Date(),
             reponse: responseContent.trim(),
             reponse_id: reponseId,
-            theme: bestTheme.nom, // Inclure le thème identifié
-            suggestions, // Ajouter les suggestions à la réponse
         });
-
     } catch (error) {
         console.error("Erreur lors du traitement de la question:", error);
         res.status(500).send("Erreur serveur");
@@ -455,7 +405,6 @@ app.get("/theme", (req, res) => {
     });
 });
 
-               
 app.post("/theme", (req, res) => {
     const { nom } = req.body;
     const query = "INSERT INTO theme (nom) VALUES (?)";
@@ -502,6 +451,7 @@ app.delete("/theme/:id", (req, res) => {
 // Gestion des contenus
 app.get("/base_connaissance", (req, res) => {
     const { theme_id } = req.query;
+
     let query = "SELECT * FROM base_connaissance";
     const params = [];
 
