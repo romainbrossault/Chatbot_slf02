@@ -1,110 +1,50 @@
 import React from 'react';
-import { Users, MessageSquare, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import '../styles/Admin.css';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: 'active' | 'inactive';
-}
-
 const Admin: React.FC = () => {
-  // Mock data for users
-  const users: User[] = [
-    { id: 1, name: 'Jean Dupont', email: 'jean@example.com', role: 'Admin', status: 'active' },
-    { id: 2, name: 'Marie Martin', email: 'marie@example.com', role: 'User', status: 'active' },
-    { id: 3, name: 'Pierre Durand', email: 'pierre@example.com', role: 'User', status: 'inactive' },
-  ];
+  const navigate = useNavigate();
 
   return (
-    <div className="admin-container">
-      <h1 className="admin-title">Interface Administrateur</h1>
-      
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-content">
-            <div className="stat-icon-container users-icon-bg">
-              <Users className="stat-icon" />
-            </div>
-            <div className="stat-info">
-              <p className="stat-label">Utilisateurs</p>
-              <p className="stat-value">{users.length}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-content">
-            <div className="stat-icon-container chats-icon-bg">
-              <MessageSquare className="stat-icon" />
-            </div>
-            <div className="stat-info">
-              <p className="stat-label">Conversations</p>
-              <p className="stat-value">24</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-content">
-            <div className="stat-icon-container issues-icon-bg">
-              <AlertTriangle className="stat-icon" />
-            </div>
-            <div className="stat-info">
-              <p className="stat-label">Problèmes</p>
-              <p className="stat-value">2</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="users-table-container">
-        <div className="table-header">
-          <h2 className="table-title">Gestion des utilisateurs</h2>
-        </div>
-        <div className="table-container">
-          <table className="users-table">
-            <thead className="table-head">
-              <tr>
-                <th className="table-header-cell">Nom</th>
-                <th className="table-header-cell">Email</th>
-                <th className="table-header-cell">Rôle</th>
-                <th className="table-header-cell">Statut</th>
-                <th className="table-header-cell">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="table-body">
-              {users.map((user) => (
-                <tr key={user.id} className="table-row">
-                  <td className="table-cell">
-                    <div className="user-name">{user.name}</div>
-                  </td>
-                  <td className="table-cell">
-                    <div className="user-email">{user.email}</div>
-                  </td>
-                  <td className="table-cell">
-                    <div className="user-role">{user.role}</div>
-                  </td>
-                  <td className="table-cell">
-                    <span className={`status-badge ${
-                      user.status === 'active' ? 'status-active' : 'status-inactive'
-                    }`}>
-                      {user.status === 'active' ? 'Actif' : 'Inactif'}
-                    </span>
-                  </td>
-                  <td className="table-cell action-buttons">
-                    <button className="edit-button">Modifier</button>
-                    <button className="delete-button">Supprimer</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <motion.div
+      className="admin-container"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
+      <motion.h1
+        className="admin-title"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+      >
+        Interface Administrateur
+      </motion.h1>
+      <motion.div
+        className="admin-buttons"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5, duration: 0.8 }}
+      >
+        <motion.button
+          className="admin-button"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/admin-knowledge')}
+        >
+          Base Connaissance
+        </motion.button>
+        <motion.button
+          className="admin-button"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/manage-tickets')}
+        >
+          Gestion Tickets
+        </motion.button>
+      </motion.div>
+    </motion.div>
   );
 };
 

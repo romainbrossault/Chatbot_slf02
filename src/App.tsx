@@ -11,6 +11,7 @@ import Account from './pages/Account';
 import ManageTheme from './pages/ManageTheme';
 import AdminKnowledge from './pages/AdminKnowledge';
 import Ticket from './pages/Ticket';
+import ManageTickets from './pages/ManageTickets'; // Import de la nouvelle page
 import { UserProvider } from './context/UserContext';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/admin-knowledge" element={<AdminKnowledge />} />
               <Route path="/manage-theme" element={<ManageTheme />} />
               <Route path="/ticket" element={<Ticket />} />
+              <Route path="/manage-tickets" element={<ManageTickets />} /> {/* Nouvelle route */}
             </Routes>
           </div>
         </div>

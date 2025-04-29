@@ -1,30 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../styles/Ticket.css';
+import { UserContext } from '../context/UserContext'; // Import du contexte utilisateur
 
 interface Ticket {
   id: number;
-  title: string;
+  titre: string;
   description: string;
-  category: string;
-  urgency: string;
-  status: string;
+  categorie: string;
+  niveau_urgence: string;
+  statut: number;
 }
 
 const Ticket: React.FC = () => {
+  const { user } = useContext(UserContext); // Récupérer l'utilisateur connecté
   const [tickets, setTickets] = useState<Ticket[]>([]); // Historique des tickets
   const [isCreating, setIsCreating] = useState(false); // État pour basculer entre l'historique et la création
-  const [title, setTitle] = useState('');
+  const [titre, setTitre] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('bug');
-  const [urgency, setUrgency] = useState('bas');
-  const [status, setStatus] = useState('envoyé'); // Statut initial du ticket
+  const [categorie, setCategorie] = useState('bug');
+  const [niveauUrgence, setNiveauUrgence] = useState('bas');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Charger les tickets existants
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const response = await fetch('http://localhost:5000/tickets');
+        const response = await fetch('http://localhost:5000/ticket');
         if (response.ok) {
           const data = await response.json();
           setTickets(data);
@@ -42,18 +43,24 @@ const Ticket: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      console.error("Utilisateur non connecté");
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/tickets', {
+      const response = await fetch('http://localhost:5000/ticket', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title,
+          titre,
           description,
-          category,
-          urgency,
-          status,
+          categorie,
+          niveau_urgence: niveauUrgence,
+          statut: 0, // Statut initial défini à 0
+          utilisateur_id: user.id, // Inclure l'utilisateur connecté
         }),
       });
 
@@ -61,17 +68,33 @@ const Ticket: React.FC = () => {
         const newTicket = await response.json();
         setTickets((prevTickets) => [...prevTickets, newTicket]);
         setSuccessMessage('Votre ticket a été envoyé avec succès.');
-        setTitle('');
+        setTitre('');
         setDescription('');
-        setCategory('bug');
-        setUrgency('bas');
-        setStatus('envoyé');
+        setCategorie('bug');
+        setNiveauUrgence('bas');
         setIsCreating(false); // Retour à l'historique après la création
       } else {
         console.error('Erreur lors de l\'envoi du ticket.');
       }
     } catch (error) {
       console.error('Erreur réseau lors de l\'envoi du ticket:', error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:5000/ticket/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setTickets((prevTickets) => prevTickets.filter((ticket) => ticket.id !== id));
+        console.log('Ticket supprimé avec succès.');
+      } else {
+        console.error('Erreur lors de la suppression du ticket.');
+      }
+    } catch (error) {
+      console.error('Erreur réseau lors de la suppression du ticket:', error);
     }
   };
 
@@ -95,17 +118,23 @@ const Ticket: React.FC = () => {
             <div className="ticket-list">
               {tickets.map((ticket) => (
                 <div key={ticket.id} className="ticket-item">
-                  <h2 className="ticket-item-title">{ticket.title}</h2>
+                  <h2 className="ticket-item-title">{ticket.titre}</h2>
                   <p className="ticket-item-description">{ticket.description}</p>
                   <p className="ticket-item-category">
-                    <strong>Catégorie :</strong> {ticket.category}
+                    <strong>Catégorie :</strong> {ticket.categorie}
                   </p>
                   <p className="ticket-item-urgency">
-                    <strong>Urgence :</strong> {ticket.urgency}
+                    <strong>Niveau d'Urgence :</strong> {ticket.niveau_urgence}
                   </p>
-                  <p className={`ticket-item-status status-${ticket.status}`}>
-                    <strong>Statut :</strong> {ticket.status}
+                  <p className={`ticket-item-status status-${ticket.statut}`}>
+                    <strong>Statut :</strong> {ticket.statut === 0 ? 'Non Ouvert' : 'Fermé'}
                   </p>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDelete(ticket.id)}
+                  >
+                    Supprimer
+                  </button>
                 </div>
               ))}
               <button
@@ -124,23 +153,23 @@ const Ticket: React.FC = () => {
           {successMessage && <p className="success-message">{successMessage}</p>}
           <form className="ticket-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="title">Titre</label>
+              <label htmlFor="titre">Titre</label>
               <input
-                id="title"
+                id="titre"
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={titre}
+                onChange={(e) => setTitre(e.target.value)}
                 placeholder="Entrez le sujet du ticket"
                 required
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="category">Catégorie</label>
+              <label htmlFor="categorie">Catégorie</label>
               <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                id="categorie"
+                value={categorie}
+                onChange={(e) => setCategorie(e.target.value)}
                 required
               >
                 <option value="bug">Bug</option>
@@ -149,11 +178,11 @@ const Ticket: React.FC = () => {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="urgency">Niveau d'Urgence</label>
+              <label htmlFor="niveau_urgence">Niveau d'Urgence</label>
               <select
-                id="urgency"
-                value={urgency}
-                onChange={(e) => setUrgency(e.target.value)}
+                id="niveau_urgence"
+                value={niveauUrgence}
+                onChange={(e) => setNiveauUrgence(e.target.value)}
                 required
               >
                 <option value="bas">Bas</option>

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, MessageSquare, User, BookOpen, Database, LogOut, ChevronDown, Ticket } from 'lucide-react';
+import { Home, MessageSquare, User, BookOpen, LogOut, ChevronDown, Ticket, Settings } from 'lucide-react';
 import '../styles/Navbar.css';
 import { UserContext } from '../context/UserContext';
 
@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
                     <MessageSquare className="link-icon" />
                     Mes Questions
                   </Link>
-                  <Link to="/ticket" className="navbar-link"> {/* Bouton Tickets */}
+                  <Link to="/ticket" className="navbar-link">
                     <Ticket className="link-icon" />
                     Ticket
                   </Link>
@@ -64,14 +64,16 @@ const Navbar: React.FC = () => {
                         <User className="dropdown-item-icon" />
                         Mon Compte
                       </Link>
-                      <Link
-                        to="/admin-knowledge"
-                        className="dropdown-item"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        <Database className="dropdown-item-icon" />
-                        Ajouter Connaissance
-                      </Link>
+                      {user.email === 'admin@chatbot.fr' && (
+                        <Link
+                          to="/admin"
+                          className="dropdown-item"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <Settings className="dropdown-item-icon" />
+                          Administration
+                        </Link>
+                      )}
                       <button
                         onClick={() => {
                           logout();

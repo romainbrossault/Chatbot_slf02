@@ -1,189 +1,48 @@
 .admin-container {
-  max-width: 80rem;
-  margin-top: 15rem;
-  margin-left: 40rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(120deg, #187bcd, #99bbc8, #2db5d5); /* Thème global */
+  color: white;
+  text-align: center;
+  padding: 2rem;
 }
 
 .admin-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: bold;
   margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-@media (min-width: 768px) {
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.stat-card {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.stat-content {
+.admin-buttons {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
 }
 
-.stat-icon-container {
-  padding: 0.75rem;
-  border-radius: 9999px;
-}
-
-.users-icon-bg {
-  background-color: #dbeafe;
-  color: #2563eb;
-}
-
-.chats-icon-bg {
-  background-color: #d1fae5;
-  color: #059669;
-}
-
-.issues-icon-bg {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
-.stat-icon {
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
-.stat-info {
-  margin-left: 1rem;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.users-table-container {
+.admin-button {
+  padding: 1rem 2rem;
   background-color: white;
+  color: #187bcd;
+  border: none;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.table-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+.admin-button:hover {
+  background-color: #187bcd;
+  color: white;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
-.table-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-.users-table {
-  min-width: 100%;
-  border-collapse: collapse;
-}
-
-.table-head {
-  background-color: #f9fafb;
-}
-
-.table-header-cell {
-  padding: 0.75rem 1.5rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.table-body {
-  background-color: white;
-}
-
-.table-row {
-  border-top: 1px solid #e5e7eb;
-}
-
-.table-cell {
-  padding: 1rem 1.5rem;
-  white-space: nowrap;
-}
-
-.user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #111827;
-}
-
-.user-email {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.user-role {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.status-badge {
-  padding: 0 0.5rem;
-  display: inline-flex;
-  font-size: 0.75rem;
-  line-height: 1.25rem;
-  font-weight: 600;
-  border-radius: 9999px;
-}
-
-.status-active {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
-.status-inactive {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.action-buttons {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.edit-button {
-  color: #2563eb;
-  margin-right: 0.75rem;
-}
-
-.edit-button:hover {
-  color: #1d4ed8;
-}
-
-.delete-button {
-  color: #dc2626;
-}
-
-.delete-button:hover {
-  color: #b91c1c;
+.admin-button:active {
+  transform: scale(0.95);
 }

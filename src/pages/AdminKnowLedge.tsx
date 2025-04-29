@@ -84,6 +84,9 @@ const AdminKnowledge: React.FC = () => {
 
   return (
     <div className="admin-knowledge-container">
+      <button className="back-button" onClick={() => navigate('/admin')}>
+        Retour
+      </button>
       <h1 className="admin-knowledge-title">Gestion des Connaissances</h1>
 
       {/* Notification */}
@@ -146,8 +149,6 @@ const AdminKnowledge: React.FC = () => {
             </div>
           </div>
         )}
-
-        
 
         {/* Bloc d'ajout de contenu */}
         <div className="content-block">

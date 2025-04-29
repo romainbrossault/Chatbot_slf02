@@ -457,7 +457,7 @@ app.get("/base_connaissance", (req, res) => {
 
     if (theme_id) {
         query += " WHERE theme_id = ?";
-        params.push(theme_id);
+        params.push(theme_id);  
     }
 
     db.query(query, params, (err, results) => {
@@ -481,6 +481,49 @@ app.post("/base_connaissance", (req, res) => {
             return;
         }
         res.json({ id: result.insertId, theme_id, contenu });
+    });
+});
+
+// Gestion des tickets
+app.get("/ticket", (req, res) => {
+    db.query("SELECT * FROM ticket", (err, results) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json(results);
+    });
+});
+
+app.post("/ticket", (req, res) => {
+    const { titre, categorie, niveau_urgence, description, utilisateur_id, statut } = req.body;
+    const query = `
+        INSERT INTO ticket (titre, categorie, niveau_urgence, description, utilisateur_id, date_creation, statut)
+        VALUES (?, ?, ?, ?, ?, NOW(), ?)
+    `;
+
+    db.query(query, [titre, categorie, niveau_urgence, description, utilisateur_id, statut], (err, result) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json({ id: result.insertId, titre, categorie, niveau_urgence, description, utilisateur_id, statut });
+    });
+});
+
+app.delete("/ticket/:id", (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM ticket WHERE id = ?";
+
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json({ message: "Ticket supprimé avec succès", id });
     });
 });
 

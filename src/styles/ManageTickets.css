@@ -1,0 +1,61 @@
+.manage-tickets-container {
+    padding: 2rem;
+  }
+  
+  .back-button {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #187bcd;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .manage-tickets-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.875rem;
+    font-weight: bold;
+  }
+  
+  .no-tickets-message {
+    text-align: center;
+    font-size: 1rem;
+    color: #6b7280;
+  }
+  
+  .tickets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .ticket-item {
+    padding: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: #f9f9f9;
+  }
+  
+  .ticket-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .ticket-description {
+    margin: 0.5rem 0;
+  }
+  
+  .ticket-category,
+  .ticket-urgency,
+  .ticket-status {
+    font-size: 0.875rem;
+  }
