@@ -1,0 +1,51 @@
+.rgpd-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #f9fafb; /* Couleur de fond globale */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rgpd-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.rgpd-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #111827;
+  margin: 0;
+}
+
+.rgpd-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* Espacement entre les sections */
+}
+
+.rgpd-card {
+  background-color: #ffffff; /* Fond blanc pour chaque section */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rgpd-section-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #187bcd;
+}
+
+.rgpd-list {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-top: 1rem;
+}
+
+.rgpd-list li {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
