@@ -1,7 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
 import '../styles/ManageTheme.css';
 
 const ManageTheme: React.FC = () => {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  // Redirection si l'utilisateur n'est pas administrateur
+  useEffect(() => {
+    if (!user || user.role !== 'administrateur') {
+      navigate('/'); // Redirige vers la page d'accueil
+    }
+  }, [user, navigate]);
+
   const [themes, setThemes] = useState<any[]>([]); // Liste des thèmes
   const [loading, setLoading] = useState<boolean>(true); // État de chargement
   const [error, setError] = useState<string | null>(null); // État d'erreur

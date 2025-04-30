@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserContext } from '../context/UserContext';
@@ -8,9 +8,10 @@ const Admin: React.FC = () => {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
+  // Redirection si l'utilisateur n'est pas administrateur
   useEffect(() => {
-    if (!user || user.role !== 'administrateur') {
-      navigate('/'); 
+    if (!user || user.role !== 'admin') {
+      navigate('/'); // Redirige vers la page d'accueil
     }
   }, [user, navigate]);
 

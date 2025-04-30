@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
 import '../styles/ManageUsers.css';
 
 interface User {
@@ -11,10 +12,19 @@ interface User {
 }
 
 const ManageUsers: React.FC = () => {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  // Redirection si l'utilisateur n'est pas administrateur
+  useEffect(() => {
+    if (!user || user.role !== 'admin') {
+      navigate('/'); // Redirige vers la page d'accueil
+    }
+  }, [user, navigate]);
+
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [updatedUser, setUpdatedUser] = useState<Partial<User>>({});
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -123,7 +133,7 @@ const ManageUsers: React.FC = () => {
                   >
                     <option value="eleve">Élève</option>
                     <option value="enseignant">Enseignant</option>
-                    <option value="admin">Administrateur</option>
+                    <option value="administrateur">Administrateur</option>
                   </select>
                   <button onClick={handleUpdate}>Enregistrer</button>
                   <button onClick={() => setEditingUser(null)}>Annuler</button>
