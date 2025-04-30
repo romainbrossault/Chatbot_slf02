@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { UserContext } from '../context/UserContext';
 import '../styles/Admin.css';
 
 const Admin: React.FC = () => {
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
+
+  // Redirection si l'utilisateur n'est pas administrateur
+  useEffect(() => {
+    if (!user || user.role !== 'admin') {
+      navigate('/'); // Redirige vers la page d'accueil
+    }
+  }, [user, navigate]);
 
   return (
     <motion.div
@@ -42,6 +51,14 @@ const Admin: React.FC = () => {
           onClick={() => navigate('/manage-tickets')}
         >
           Gestion Tickets
+        </motion.button>
+        <motion.button
+          className="admin-button"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/manage-users')}
+        >
+          Gestion Utilisateur
         </motion.button>
       </motion.div>
     </motion.div>

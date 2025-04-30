@@ -5,7 +5,7 @@ interface User {
   nom: string;
   prenom: string;
   email: string;
-  role: string;
+  role: string; // Ajout du rôle
 }
 
 interface UserContextType {
@@ -31,17 +31,11 @@ export const UserProvider: React.FC = ({ children }) => {
   }, []);
 
   const login = (newUser: User) => {
-    if (user && user.id === newUser.id) {
-      console.log("🔐 Utilisateur déjà connecté:", user);
-      return;
-    }
-    console.log("🔐 Connexion réussie:", newUser);
     setUser(newUser);
     localStorage.setItem('user', JSON.stringify(newUser));
   };
 
   const logout = () => {
-    console.log("🚪 Déconnexion");
     setUser(null);
     localStorage.removeItem('user');
   };

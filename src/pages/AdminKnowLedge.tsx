@@ -1,8 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
 import '../styles/AdminKnowledge.css';
 
 const AdminKnowledge: React.FC = () => {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  // Redirection si l'utilisateur n'est pas administrateur
+  useEffect(() => {
+    if (!user || user.role !== 'admin') {
+      navigate('/'); // Redirige vers la page d'accueil
+    }
+  }, [user, navigate]);
+
   const [themes, setThemes] = useState<any[]>([]); // Liste des thèmes depuis la base de données
   const [selectedThemeId, setSelectedThemeId] = useState<number | null>(null); // ID du thème sélectionné
   const [contenu, setContenu] = useState('');
@@ -12,7 +23,6 @@ const AdminKnowledge: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false); // État pour la pop-up
   const [newThemeName, setNewThemeName] = useState(''); // Nom du nouveau thème
   const [popupMessage, setPopupMessage] = useState<string | null>(null); // Message de confirmation dans la pop-up
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Récupérer les thèmes depuis la table "theme"
