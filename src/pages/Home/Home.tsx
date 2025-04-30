@@ -1,9 +1,9 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Send, Key } from 'lucide-react';
-import '../styles/Home.css';
-import { UserContext } from '../context/UserContext';
-import logo from '../img/logo02.svg';
+import './styles/Home.css';
+import { UserContext } from '../../context/UserContext';
+import logo from '../../img/logo02.svg';
 
 interface Message {
   id: number;

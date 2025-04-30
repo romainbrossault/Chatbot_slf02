@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../context/UserContext';
-import '../styles/AdminKnowledge.css';
+import { UserContext } from '../../context/UserContext';
+import './styles/AdminKnowledge.css';
 
 const AdminKnowledge: React.FC = () => {
   const { user } = useContext(UserContext);

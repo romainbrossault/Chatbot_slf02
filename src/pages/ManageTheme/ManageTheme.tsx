@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../context/UserContext';
-import '../styles/ManageTheme.css';
+import { UserContext } from '../../context/UserContext';
+import './styles/ManageTheme.css';
 
 const ManageTheme: React.FC = () => {
   const { user } = useContext(UserContext);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import '../styles/Ticket.css';
-import { UserContext } from '../context/UserContext'; // Import du contexte utilisateur
+import './styles/Ticket.css';
+import { UserContext } from '../../context/UserContext'; // Import du contexte utilisateur
 
 interface Ticket {
   id: number;

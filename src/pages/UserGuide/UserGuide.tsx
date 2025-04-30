@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageSquare, User, Shield, BookOpen } from 'lucide-react';
-import '../styles/UserGuide.css';
+import './styles/UserGuide.css';
 
 const UserGuide: React.FC = () => {
   return (

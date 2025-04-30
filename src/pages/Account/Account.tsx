@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { UserContext } from '../context/UserContext';
-import '../styles/Account.css';
+import { UserContext } from '../../context/UserContext';
+import './styles/Account.css';
 
 const Account: React.FC = () => {
   const { user, logout } = useContext(UserContext);

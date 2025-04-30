@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../context/UserContext';
-import '../styles/ManageUsers.css';
+import { UserContext } from '../../context/UserContext';
+import './styles/ManageUsers.css';
 
 interface User {
   id: number;

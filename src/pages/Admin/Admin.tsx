@@ -1,8 +1,8 @@
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { UserContext } from '../context/UserContext';
-import '../styles/Admin.css';
+import { UserContext } from '../../context/UserContext';
+import './styles/Admin.css';
 
 const Admin: React.FC = () => {
   const { user } = useContext(UserContext);

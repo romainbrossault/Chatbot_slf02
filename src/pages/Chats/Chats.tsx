@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Trash2, Search } from 'lucide-react';
-import '../styles/Chats.css';
-import { UserContext } from '../context/UserContext';
+import './styles/Chats.css';
+import { UserContext } from '../../context/UserContext';
 
 interface ChatLog {
   id: number;

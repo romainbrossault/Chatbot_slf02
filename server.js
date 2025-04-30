@@ -3,6 +3,7 @@ import mysql from "mysql2";
 import dotenv from "dotenv";
 import cors from "cors";
 import natural from "natural";
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,18 @@ const db = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
+});
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'chatbotstfelixlasalle@gmail.com',
+        pass: process.env.EMAIL_PASS,
+    },
+    logger: true, // Active les logs
+    debug: true,  // Active le mode débogage
 });
 
 db.connect((err) => {
@@ -62,7 +75,7 @@ app.get("/utilisateur/login", (req, res) => {
 
 app.post("/utilisateur", (req, res) => {
     const { nom, prenom, email, password, role } = req.body;
-    const query = "INSERT INTO utilisateur (nom, prenom, email, password, role, date_inscription) VALUES (?, ?, ?, ?, ?, NOW())";
+    const query = "INSERT INTO utilisateur (nom, prenom, email, password, role, confirmation, date_inscription) VALUES (?, ?, ?, ?, ?, FALSE, NOW())";
 
     db.query(query, [nom, prenom, email, password, role], (err, result) => {
         if (err) {
@@ -70,7 +83,37 @@ app.post("/utilisateur", (req, res) => {
             res.status(500).send("Erreur serveur");
             return;
         }
-        res.json({ id: result.insertId, nom, prenom, email, role });
+
+        const confirmationLink = `http://localhost:5000/confirm/${result.insertId}`;
+        const mailOptions = {
+            from: 'chatbotstfelixlasalle@gmail.com', // Adresse Gmail
+            to: email, // Adresse e-mail de l'utilisateur
+            subject: 'Confirmation de votre compte',
+            text: `Bonjour ${prenom},\n\nCliquez sur ce lien pour confirmer votre compte : ${confirmationLink}\n\nMerci.`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error("Erreur lors de l'envoi de l'e-mail:", error);
+                res.status(500).send("Erreur lors de l'envoi de l'e-mail");
+                return;
+            }
+            res.json({ message: "Utilisateur créé avec succès. E-mail de confirmation envoyé." });
+        });
+    });
+});
+
+app.get("/confirm/:id", (req, res) => {
+    const { id } = req.params;
+    const query = "UPDATE utilisateur SET confirmation = TRUE WHERE id = ?";
+
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            console.error("Erreur SQL:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.send("Compte confirmé avec succès !");
     });
 });
 

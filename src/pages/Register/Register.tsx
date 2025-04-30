@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
-import '../styles/Register.css';
-import { UserContext } from '../context/UserContext';
+import './styles/Register.css';
+import { UserContext } from '../../context/UserContext';
 
 const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -17,17 +17,25 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (password !== confirmPassword) {
       console.error('Passwords do not match');
       return;
     }
-
+  
     if (!acceptRGPD) {
       console.error('Vous devez accepter les conditions RGPD.');
       return;
     }
-
+  
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const domain = '@stfelixlasalle.fr';
+  
+    if (!emailRegex.test(email) || !email.endsWith(domain)) {
+      console.error(`L'adresse e-mail doit être valide et se terminer par ${domain}`);
+      return;
+    }
+  
     try {
       const response = await fetch('http://localhost:5000/utilisateur', {
         method: 'POST',
@@ -42,12 +50,10 @@ const Register: React.FC = () => {
           role,
         }),
       });
-
+  
       if (response.ok) {
-        const data = await response.json();
-        console.log('Account created successfully:', data);
-        login(data);
-        navigate('/');
+        console.log('Un e-mail de confirmation a été envoyé.');
+        navigate('/confirmation-pending');
       } else {
         console.error('Account creation failed');
       }

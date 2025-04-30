@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/ManageTickets.css';
+import './styles/ManageTickets.css';
 
 interface Ticket {
   id: number;

@@ -1,19 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Chats from './pages/Chats';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import RGPD from './pages/RGPD'; // Import de la page RGPD
-import Admin from './pages/Admin';
-import UserGuide from './pages/UserGuide';
-import Account from './pages/Account';
-import ManageTheme from './pages/ManageTheme';
-import AdminKnowledge from './pages/AdminKnowledge';
-import Ticket from './pages/Ticket';
-import ManageTickets from './pages/ManageTickets'; 
-import ManageUsers from './pages/ManageUsers'; 
+import Home from './pages/Home/Home';
+import Chats from './pages/Chats/Chats';
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
+import RGPD from './pages/RGPD'; 
+import Admin from './pages/Admin/Admin';
+import UserGuide from './pages/UserGuide/UserGuide';
+import Account from './pages/Account/Account';
+import ManageTheme from './pages/ManageTheme/ManageTheme';
+import AdminKnowledge from './pages/AdminKnowLedge/AdminKnowLedge';
+import Ticket from './pages/Ticket/Ticket';
+import ManageTickets from './pages/ManageTickets/ManageTickets'; 
+import ManageUsers from './pages/ManageUsers/ManageUsers'; 
 import { UserProvider } from './context/UserContext';
 
 function App() {
