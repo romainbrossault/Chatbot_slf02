@@ -20,6 +20,13 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
 
+  const maskPassword = (text: string): string => {
+    const passwordRegex = /Tester mon mot de passe\s*:\s*(\S+)/i;
+    return text.replace(passwordRegex, (match, p1) => {
+      return `Test du mot de passe : ${'*'.repeat(p1.length)}`;
+    });
+  };
+
   const handleSubmit = async (e?: React.FormEvent, question?: string) => {
     if (e) e.preventDefault();
     if (!user) {
@@ -56,7 +63,7 @@ const Home: React.FC = () => {
 
         const aiMessage: Message = {
           id: Date.now() + 1,
-          text: data.reponse || "Je n'ai pas trouvé de réponse à votre question.",
+          text: maskPassword(data.reponse || "Je n'ai pas trouvé de réponse à votre question."),
           isUser: false,
         };
         setMessages((prev) => [...prev, aiMessage]);
@@ -121,14 +128,14 @@ const Home: React.FC = () => {
                   <div className="ai-message-full">
                     <img src={logo} alt="Logo" className="ai-logo" />
                     <div className="message ai-message">
-                      {message.text}
+                      {maskPassword(message.text)}
                     </div>
                   </div>
                 )}
 
                 {message.isUser && (
                   <div className="message user-message">
-                    {message.text}
+                    {maskPassword(message.text)}
                   </div>
                 )}
               </div>
@@ -151,7 +158,7 @@ const Home: React.FC = () => {
             <div className="message-input-wrapper">
               {isPasswordTest && <span className="fixed-text">Tester mon mot de passe : </span>}
               <input
-                type="text"
+                type={isPasswordTest ? 'password' : 'text'}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isPasswordTest ? '' : 'Posez votre question ici...'}

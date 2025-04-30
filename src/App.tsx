@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Chats from './pages/Chats';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import RGPD from './pages/RGPD'; // Import de la page RGPD
 import Admin from './pages/Admin';
 import UserGuide from './pages/UserGuide';
 import Account from './pages/Account';
@@ -26,6 +27,7 @@ function App() {
               <Route path="/chats" element={<Chats />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/rgpd" element={<RGPD/>} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/guide" element={<UserGuide />} />
               <Route path="/account" element={<Account />} />

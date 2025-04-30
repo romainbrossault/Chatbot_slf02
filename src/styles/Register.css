@@ -163,3 +163,20 @@ body {
   border: 1px solid #d1d5db;
   color: #111827;
 }
+
+.rgpd-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.rgpd-link {
+  color: #187bcd;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rgpd-link:hover {
+  color: #1d4ed8;
+}

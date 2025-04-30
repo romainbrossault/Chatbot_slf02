@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import '../styles/Register.css';
 import { UserContext } from '../context/UserContext';
-import { ChevronDown } from 'lucide-react';
 
 const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -12,6 +11,7 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('élève');
+  const [acceptRGPD, setAcceptRGPD] = useState(false); // État pour la case RGPD
   const navigate = useNavigate();
   const { login } = useContext(UserContext);
 
@@ -20,6 +20,11 @@ const Register: React.FC = () => {
 
     if (password !== confirmPassword) {
       console.error('Passwords do not match');
+      return;
+    }
+
+    if (!acceptRGPD) {
+      console.error('Vous devez accepter les conditions RGPD.');
       return;
     }
 
@@ -140,7 +145,6 @@ const Register: React.FC = () => {
               className="form-input form-input-with-icon"
               placeholder="Confirmer le mot de passe"
             />
-            
           </div>
           <div className="input-group">
             <div className="select-wrapper">
@@ -160,7 +164,21 @@ const Register: React.FC = () => {
               </select>
             </div>
           </div>
-
+          <div className="rgpd-container">
+            <input
+              type="checkbox"
+              id="accept-rgpd"
+              checked={acceptRGPD}
+              onChange={(e) => setAcceptRGPD(e.target.checked)}
+              required
+            />
+            <label htmlFor="accept-rgpd">
+              J'accepte les{' '}
+              <Link to="/rgpd" className="rgpd-link">
+                conditions RGPD
+              </Link>
+            </label>
+          </div>
           <div>
             <button
               type="submit"
