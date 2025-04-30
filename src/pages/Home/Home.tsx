@@ -16,6 +16,7 @@ const Home: React.FC = () => {
   const [isPasswordTest, setIsPasswordTest] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<number | null>(null);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,27 @@ const Home: React.FC = () => {
     return text.replace(passwordRegex, (match, p1) => {
       return `Test du mot de passe : ${'*'.repeat(p1.length)}`;
     });
+  };
+
+  const handleGeneratePassword = () => {
+    const generatedPassword = generatePassword();
+    const passwordMessage: Message = {
+      id: Date.now(),
+      text: `Mot de passe généré : ${generatedPassword}`,
+      isUser: false,
+    };
+    setMessages((prev) => [...prev, passwordMessage]);
+    setShowPasswordPopup(false); // Fermer la pop-up
+  };
+
+  const generatePassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+    return password;
   };
 
   const handleSubmit = async (e?: React.FormEvent, question?: string) => {
@@ -82,16 +104,11 @@ const Home: React.FC = () => {
     } catch (error) {
       const aiMessage: Message = {
         id: Date.now() + 1,
-        text: "Je n'ai pas compris votre question. Pouvez-vous reformuler ?",
+        text: "Une erreur est survenue. Veuillez réessayer.",
         isUser: false,
       };
       setMessages((prev) => [...prev, aiMessage]);
     }
-  };
-
-  const handleTestPassword = () => {
-    setIsPasswordTest(true);
-    setInput('');
   };
 
   useEffect(() => {
@@ -149,11 +166,11 @@ const Home: React.FC = () => {
           <form onSubmit={handleSubmit} className="input-form">
             <button
               type="button"
-              onClick={handleTestPassword}
+              onClick={() => setShowPasswordPopup(true)}
               className="test-password-button"
             >
               <Key className="h-5 w-5" />
-              Tester MDP
+              Mot de passe
             </button>
             <div className="message-input-wrapper">
               {isPasswordTest && <span className="fixed-text">Tester mon mot de passe : </span>}
@@ -169,6 +186,16 @@ const Home: React.FC = () => {
               <Send className="h-5 w-5" />
             </button>
           </form>
+        </div>
+      )}
+
+      {showPasswordPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <button onClick={() => { setIsPasswordTest(true); setShowPasswordPopup(false); }}>Tester MDP</button>
+            <button onClick={handleGeneratePassword}>Générer MDP</button>
+            <button onClick={() => setShowPasswordPopup(false)}>Fermer</button>
+          </div>
         </div>
       )}
     </div>

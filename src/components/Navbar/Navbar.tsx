@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, MessageSquare, User, BookOpen, LogOut, ChevronDown, Ticket, Settings } from 'lucide-react';
-import '../styles/Navbar.css';
-import { UserContext } from '../context/UserContext';
+import './styles/Navbar.css';
+import { UserContext } from '../../context/UserContext';
 
-import logo from '../img/logo02.svg';
+import logo from '../../img/logo02.svg';
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
