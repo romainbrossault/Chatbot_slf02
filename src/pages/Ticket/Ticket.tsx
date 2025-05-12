@@ -24,8 +24,15 @@ const Ticket: React.FC = () => {
   // Charger les tickets existants
   useEffect(() => {
     const fetchTickets = async () => {
+      if (!user) {
+        console.error("Utilisateur non connecté");
+        return;
+      }
+  
       try {
-        const response = await fetch('http://localhost:5000/ticket');
+        const response = await fetch(
+          `http://localhost:5000/ticket?utilisateur_id=${user.id}&role=${user.role}`
+        );
         if (response.ok) {
           const data = await response.json();
           setTickets(data);
@@ -36,9 +43,9 @@ const Ticket: React.FC = () => {
         console.error('Erreur réseau lors de la récupération des tickets:', error);
       }
     };
-
+  
     fetchTickets();
-  }, []);
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

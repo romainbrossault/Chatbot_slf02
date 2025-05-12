@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/UserContext'; // Import du contexte utilisateur
 import './styles/ManageTickets.css';
 
 interface Ticket {
@@ -14,26 +15,41 @@ interface Ticket {
 }
 
 const ManageTickets: React.FC = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const { user } = useContext(UserContext); // Récupérer l'utilisateur connecté
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/ticket');
-        if (response.ok) {
-          const data = await response.json();
-          setTickets(data);
-        } else {
-          console.error('Erreur lors de la récupération des tickets.');
-        }
-      } catch (error) {
-        console.error('Erreur réseau lors de la récupération des tickets:', error);
-      }
-    };
+    if (!user || user.role !== 'admin') {
+      navigate('/'); 
+    }
+  }, [user, navigate]);
 
-    fetchTickets();
-  }, []);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+
+ useEffect(() => {
+     const fetchTickets = async () => {
+       if (!user) {
+         console.error("Utilisateur non connecté");
+         return;
+       }
+   
+       try {
+         const response = await fetch(
+           `http://localhost:5000/ticket?utilisateur_id=${user.id}&role=${user.role}`
+         );
+         if (response.ok) {
+           const data = await response.json();
+           setTickets(data);
+         } else {
+           console.error('Erreur lors de la récupération des tickets.');
+         }
+       } catch (error) {
+         console.error('Erreur réseau lors de la récupération des tickets:', error);
+       }
+     };
+   
+     fetchTickets();
+   }, [user]);
 
   const handleResolve = async (id: number) => {
     try {
@@ -72,32 +88,32 @@ const ManageTickets: React.FC = () => {
         <div className="tickets-list">
           {tickets.map((ticket) => (
             <div
-            key={ticket.id}
-            className={`ticket-item status-${ticket.statut}`} // Classe dynamique basée sur le statut
-          >
-            <h2 className="ticket-title">{ticket.titre}</h2>
-            <p className="ticket-description">{ticket.description}</p>
-            <p className="ticket-category">
-              <strong>Catégorie :</strong> {ticket.categorie}
-            </p>
-            <p className="ticket-urgency">
-              <strong>Niveau d'Urgence :</strong> {ticket.niveau_urgence}
-            </p>
-            <p className="ticket-user">
-              <strong>Utilisateur :</strong> {ticket.utilisateur_prenom} {ticket.utilisateur_nom}
-            </p>
-            <p className={`ticket-status status-${ticket.statut}`}>
-              <strong>Statut :</strong> {ticket.statut === 0 ? 'Non Résolu' : 'Résolu'}
-            </p>
-            <label className="resolve-label">
-              <input
-                type="checkbox"
-                disabled={ticket.statut === 1}
-                onChange={() => handleResolve(ticket.id)}
-              />
-              Marquer comme résolu
-            </label>
-          </div>
+              key={ticket.id}
+              className={`ticket-item status-${ticket.statut}`} // Classe dynamique basée sur le statut
+            >
+              <h2 className="ticket-title">{ticket.titre}</h2>
+              <p className="ticket-description">{ticket.description}</p>
+              <p className="ticket-category">
+                <strong>Catégorie :</strong> {ticket.categorie}
+              </p>
+              <p className="ticket-urgency">
+                <strong>Niveau d'Urgence :</strong> {ticket.niveau_urgence}
+              </p>
+              <p className="ticket-user">
+                <strong>Utilisateur :</strong> {ticket.utilisateur_prenom} {ticket.utilisateur_nom}
+              </p>
+              <p className={`ticket-status status-${ticket.statut}`}>
+                <strong>Statut :</strong> {ticket.statut === 0 ? 'Non Résolu' : 'Résolu'}
+              </p>
+              <label className="resolve-label">
+                <input
+                  type="checkbox"
+                  disabled={ticket.statut === 1}
+                  onChange={() => handleResolve(ticket.id)}
+                />
+                Marquer comme résolu
+              </label>
+            </div>
           ))}
         </div>
       )}

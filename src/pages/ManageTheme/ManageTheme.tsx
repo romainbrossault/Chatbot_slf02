@@ -9,7 +9,7 @@ const ManageTheme: React.FC = () => {
 
   // Redirection si l'utilisateur n'est pas administrateur
   useEffect(() => {
-    if (!user || user.role !== 'administrateur') {
+    if (!user || user.role !== 'admin') {
       navigate('/'); // Redirige vers la page d'accueil
     }
   }, [user, navigate]);

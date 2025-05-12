@@ -558,7 +558,25 @@ app.post("/base_connaissance", (req, res) => {
 
 // Gestion des tickets
 app.get("/ticket", (req, res) => {
-    db.query("SELECT * FROM ticket", (err, results) => {
+    const { utilisateur_id, role } = req.query;
+
+    let query = `
+        SELECT 
+            ticket.*, 
+            utilisateur.nom AS utilisateur_nom, 
+            utilisateur.prenom AS utilisateur_prenom
+        FROM ticket
+        JOIN utilisateur ON ticket.utilisateur_id = utilisateur.id
+    `;
+
+    const queryParams = [];
+
+    if (role !== 'admin') {
+        query += " WHERE ticket.utilisateur_id = ?";
+        queryParams.push(utilisateur_id);
+    }
+
+    db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error("Erreur SQL:", err);
             res.status(500).send("Erreur serveur");

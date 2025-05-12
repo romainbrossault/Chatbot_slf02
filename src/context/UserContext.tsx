@@ -5,7 +5,7 @@ interface User {
   nom: string;
   prenom: string;
   email: string;
-  role: string; // Ajout du rôle
+  role: string; 
 }
 
 interface UserContextType {

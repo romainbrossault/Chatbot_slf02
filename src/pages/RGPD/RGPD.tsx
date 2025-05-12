@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/RGPD.css';
+import './styles/RGPD.css';
 
 const RGPD: React.FC = () => {
   return (

@@ -88,6 +88,38 @@ const AdminKnowledge: React.FC = () => {
     }
   };
 
+  const handleAddContent = async () => {
+    if (!selectedThemeId || !contenu.trim()) {
+      setNotification('Veuillez sélectionner un thème et entrer un contenu.');
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:5000/base_connaissance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          theme_id: selectedThemeId,
+          contenu,
+        }),
+      });
+  
+      if (response.ok) {
+        const newContent = await response.json();
+        setKnowledgeList((prevKnowledge) => [...prevKnowledge, newContent]);
+        setContenu('');
+        setNotification('Contenu ajouté avec succès.');
+      } else {
+        setNotification('Erreur lors de l’ajout du contenu.');
+      }
+    } catch (error) {
+      console.error('Erreur réseau lors de l’ajout du contenu:', error);
+      setNotification('Erreur réseau. Veuillez réessayer.');
+    }
+  };
+
   const filteredKnowledge = knowledgeList.filter(
     (item) => item.theme_id === searchThemeId
   );
@@ -109,7 +141,7 @@ const AdminKnowledge: React.FC = () => {
             Ajouter un Thème
           </button>
           <button
-            onClick={() => navigate('/manage-theme')} // Redirection vers la page "ManageTheme"
+            onClick={() => navigate('/manage-theme')} 
             className="manage-theme-button"
           >
             Gérer les Thèmes
@@ -136,7 +168,7 @@ const AdminKnowledge: React.FC = () => {
                   className="popup-button cancel"
                   onClick={() => {
                     setIsPopupOpen(false);
-                    setPopupMessage(null); // Réinitialiser le message
+                    setPopupMessage(null); 
                   }}
                 >
                   Annuler
@@ -189,7 +221,7 @@ const AdminKnowledge: React.FC = () => {
                 required
               ></textarea>
             </div>
-            <button type="submit" className="submit-button">
+            <button type="button" className="submit-button" onClick={handleAddContent}>
               Ajouter
             </button>
           </form>

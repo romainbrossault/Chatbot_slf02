@@ -5,7 +5,7 @@ import Home from './pages/Home/Home';
 import Chats from './pages/Chats/Chats';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-import RGPD from './pages/RGPD'; 
+import RGPD from './pages/RGPD/RGPD'; 
 import Admin from './pages/Admin/Admin';
 import UserGuide from './pages/UserGuide/UserGuide';
 import Account from './pages/Account/Account';
