@@ -189,38 +189,69 @@ app.get("/question", (req, res) => {
 });
 
 // Supprimer une question et sa réponse associée
-app.delete("/question/:id", (req, res) => {
+app.delete("/logs_interaction/:id", (req, res) => {
     const { id } = req.params;
 
-    //Supprimer l'interaction associée
-    const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
-    db.query(deleteInteractionQuery, [id], (err) => {
-        if (err) {
-            console.error("Erreur SQL lors de la suppression de l'interaction:", err);
+    console.log(`🔍 Début de la suppression de la question avec ID: ${id}`);
+
+    db.beginTransaction((transactionErr) => {
+        if (transactionErr) {
+            console.error("❌ Erreur lors du démarrage de la transaction:", transactionErr);
             res.status(500).send("Erreur serveur");
             return;
         }
-    });
+        console.log("✅ Transaction démarrée avec succès.");
 
-    // Supprimer la réponse associée
-    const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
-    db.query(deleteResponseQuery, [id], (err) => {
-        if (err) {
-            console.error("Erreur SQL lors de la suppression de la réponse:", err);
-            res.status(500).send("Erreur serveur");
-            return;
-        }
-
-        // Supprimer la question
-        const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
-        db.query(deleteQuestionQuery, [id], (err) => {
+        // Supprimer l'interaction associée
+        const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
+        db.query(deleteInteractionQuery, [id], (err) => {
             if (err) {
-                console.error("Erreur SQL lors de la suppression de la question:", err);
-                res.status(500).send("Erreur serveur");
-                return;
+                console.error("❌ Erreur SQL lors de la suppression de l'interaction:", err);
+                return db.rollback(() => {
+                    console.log("🔄 Transaction annulée.");
+                    res.status(500).send("Erreur serveur");
+                });
             }
+            console.log("✅ Interactions associées supprimées avec succès.");
 
-            res.json({ message: "Question et réponse associée supprimées avec succès", id });
+            // Supprimer la réponse associée
+            const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
+            db.query(deleteResponseQuery, [id], (err) => {
+                if (err) {
+                    console.error("❌ Erreur SQL lors de la suppression de la réponse:", err);
+                    return db.rollback(() => {
+                        console.log("🔄 Transaction annulée.");
+                        res.status(500).send("Erreur serveur");
+                    });
+                }
+                console.log("✅ Réponses associées supprimées avec succès.");
+
+                // Supprimer la question
+                const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
+                db.query(deleteQuestionQuery, [id], (err) => {
+                    if (err) {
+                        console.error("❌ Erreur SQL lors de la suppression de la question:", err);
+                        return db.rollback(() => {
+                            console.log("🔄 Transaction annulée.");
+                            res.status(500).send("Erreur serveur");
+                        });
+                    }
+                    console.log("✅ Question supprimée avec succès.");
+
+                    // Valider la transaction
+                    db.commit((commitErr) => {
+                        if (commitErr) {
+                            console.error("❌ Erreur lors de la validation de la transaction:", commitErr);
+                            return db.rollback(() => {
+                                console.log("🔄 Transaction annulée.");
+                                res.status(500).send("Erreur serveur");
+                            });
+                        }
+                        console.log("✅ Transaction validée avec succès.");
+                        res.json({ message: "Question et historique associés supprimés avec succès", id });
+                    });
+                });
+            });
         });
     });
 });
