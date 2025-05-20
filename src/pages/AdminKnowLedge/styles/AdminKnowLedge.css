@@ -239,3 +239,43 @@ textarea#contenu:focus {
 .back-button:hover {
   background-color: #1d4ed8;
 }
+
+/* Mode sombre pour la page Admin Knowledge */
+body.dark-mode .admin-knowledge-container {
+  background-color: #1f2937; /* Fond sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .admin-knowledge-title {
+  color: #f3f4f6; /* Texte clair pour le titre */
+}
+
+body.dark-mode .theme-block,
+body.dark-mode .content-block,
+body.dark-mode .list-block {
+  background-color: #374151; /* Fond sombre pour les blocs */
+  color: #f3f4f6; /* Texte clair */
+  border: 1px solid #4b5563; /* Bordure sombre */
+}
+
+body.dark-mode .add-theme-button,
+body.dark-mode .manage-theme-button,
+body.dark-mode .submit-button,
+body.dark-mode .back-button {
+
+  background-color: #6b7280; /* Bouton gris */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .add-theme-button:hover,
+body.dark-mode .manage-theme-button:hover,
+body.dark-mode .submit-button:hover,
+body.dark-mode .back-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}
+
+body.dark-mode .knowledge-list li {
+  background-color: #374151; /* Fond sombre pour les éléments de la liste */
+  color: #f3f4f6; /* Texte clair */
+  border: 1px solid #4b5563; /* Bordure sombre */
+}

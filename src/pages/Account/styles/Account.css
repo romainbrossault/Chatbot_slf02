@@ -45,3 +45,26 @@
 .flex {
   background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
 }
+
+/* Mode sombre pour la page Account */
+body.dark-mode .account-container {
+  background-color: #374151 ; /* Fond sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .account-title {
+  color: #f3f4f6; /* Texte clair pour le titre */
+}
+
+body.dark-mode .account-details p {
+  color: #f3f4f6; /* Texte clair pour les détails */
+}
+
+body.dark-mode .logout-button {
+  background-color: #6b7280; /* Bouton gris */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .logout-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}

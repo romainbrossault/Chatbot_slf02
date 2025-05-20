@@ -1,0 +1,64 @@
+/* Mode sombre */
+body.dark-mode {
+    background-color: #1f2937; /* Fond sombre */
+    color: #f3f4f6; /* Texte clair */
+  }
+  
+  /* Navbar en mode sombre */
+  .navbar.dark-mode {
+    background-color: #374151; /* Fond sombre pour la navbar */
+    color: #f3f4f6;
+  }
+  
+  /* Liens de la navbar en mode sombre */
+  .navbar-link.dark-mode {
+    color: #f3f4f6;
+  }
+  
+  .navbar-link.dark-mode:hover {
+    background-color: #4b5563; /* Couleur au survol */
+  }
+  
+  /* Dropdown en mode sombre */
+  .dropdown-menu.dark-mode {
+    background-color: #374151;
+    color: #f3f4f6;
+    border: 1px solid #4b5563;
+  }
+  
+  /* Boutons en mode sombre */
+  .theme-toggle-button.dark-mode {
+    background-color: #4b5563;
+    color: #f3f4f6;
+  }
+  
+  .theme-toggle-button.dark-mode:hover {
+    background-color: #6b7280;
+  }
+
+  /* Mode sombre pour les boutons de la navbar */
+body.dark-mode .theme-toggle-button {
+  background-color: #6b7280; /* Bouton gris */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .theme-toggle-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}
+
+body.dark-mode .navbar-link {
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .navbar-link:hover {
+  background-color: #4b5563; /* Fond sombre au survol */
+}
+
+body.dark-mode .dropdown-button {
+  background-color: #6b7280; /* Bouton gris */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .dropdown-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}

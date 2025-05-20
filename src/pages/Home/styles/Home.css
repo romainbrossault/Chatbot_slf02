@@ -2,6 +2,75 @@ body {
   overflow: hidden; 
 }
 
+/* Mode sombre pour la page Home */
+body.dark-mode .home-container {
+  background: #1f2937; /* Fond sombre statique */
+}
+
+body.dark-mode .home-container::before {
+  content: none; /* Supprime l'élément dynamique */
+}
+
+body.dark-mode .chat-area {
+  background: #1f2937; /* Fond sombre pour la zone de chat */
+}
+
+body.dark-mode .welcome-container {
+  background: #1f2937; /* Fond sombre pour la zone de bienvenue */
+}
+
+body.dark-mode .welcome-title,
+body.dark-mode .welcome-text {
+  color: #f3f4f6; /* Texte clair pour le mode sombre */
+}
+
+body.dark-mode .input-area {
+  background: #374151; /* Fond sombre pour la zone d'entrée */
+}
+/* Mode sombre pour le formulaire */
+body.dark-mode .input-form {
+  background-color: #4b5563; /* Fond sombre pour le formulaire */
+  border: 1px solid #4b5563; /* Bordure sombre */
+}
+
+body.dark-mode .message-input {
+  background-color: #4b5563; /* Fond sombre pour le champ d'entrée */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .message-input::placeholder {
+  color: #9ca3af; /* Placeholder clair */
+}
+
+body.dark-mode .send-button {
+  background-color: #6b7280; /* Bouton gris pour le mode sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .send-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}
+
+body.dark-mode .test-password-button {
+  background-color: #6b7280; /* Bouton gris pour le mode sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .test-password-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}
+
+body.dark-mode .message.user-message {
+  background-color: #6b7280; /* Bouton gris pour le mode sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .message.ai-message {
+  background-color: #6b7280; /* Bouton gris pour le mode sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+
 .home-container {
   display: flex;
   flex-direction: column;
@@ -9,18 +78,6 @@ body {
   position: relative;
   overflow: hidden;
   background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
-}
-
-@keyframes moveBackground {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 .home-container::before {
@@ -32,7 +89,6 @@ body {
   height: 100%;
   background: linear-gradient(120deg, #187bcd, #99bbc8, #2db5d5, #ff7e5f); /* Ajoutez une couleur supplémentaire */
   background-size: 400% 400%; /* Augmentez la taille de l'arrière-plan */
-  animation: moveBackground 3s ease infinite; /* Réduisez la durée de l'animation */
   z-index: -1;
   opacity: 0.7;
 }
@@ -53,7 +109,6 @@ body {
   position: absolute;
   width: 100px;
   height: 100px;
-  background-color: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   animation: float 4s ease-in-out infinite;
 }
@@ -92,7 +147,6 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  background-color: white;
   scroll-behavior: smooth;
   background: linear-gradient(120deg, #187bcd, #99bbc8 ,#2db5d5);
 }
@@ -506,3 +560,4 @@ body {
 .popup button:hover {
   background-color: #1d4ed8;
 }
+

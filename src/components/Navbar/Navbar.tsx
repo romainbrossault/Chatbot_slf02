@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, MessageSquare, User, BookOpen, LogOut, ChevronDown, Ticket, Settings } from 'lucide-react';
+import Theme from '../Theme/Theme'; // Import du composant Theme
 import './styles/Navbar.css';
 import { UserContext } from '../../context/UserContext';
 
@@ -18,6 +19,7 @@ const Navbar: React.FC = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-content">
+          {/* Section gauche : Logo et liens principaux */}
           <div className="navbar-left">
             <Link to="/" className="navbar-logo">
               <img src={logo} alt="Logo" className="logo-icon" />
@@ -36,13 +38,16 @@ const Navbar: React.FC = () => {
                   </Link>
                   <Link to="/ticket" className="navbar-link">
                     <Ticket className="link-icon" />
-                    Ticket
+                    Tickets
                   </Link>
                 </>
               )}
             </div>
           </div>
+
+          {/* Section droite : Bouton de thème et menu utilisateur */}
           <div className="navbar-right">
+            <Theme /> {/* Bouton pour changer le thème */}
             <div className="dropdown">
               <button
                 onClick={toggleDropdown}

@@ -125,3 +125,39 @@
   outline: none;
 }
 
+/* Mode sombre pour la page Chats */
+body.dark-mode .chats-container {
+  background-color: #1f2937; /* Fond sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .chats-title,
+body.dark-mode .chat-title,
+body.dark-mode .chats-date,
+body.dark-mode .chats-question {
+  color: #f3f4f6; /* Texte clair pour le titre */
+}
+
+body.dark-mode .search-bar {
+  background-color: #374151; /* Fond sombre pour la barre de recherche */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .search-input {
+  background-color: #4b5563; /* Fond sombre pour le champ de recherche */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .chat-item {
+  background-color: #374151; /* Fond sombre pour les éléments de la liste */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .chat-item:hover {
+  background-color: #4b5563; /* Fond sombre au survol */
+}
+
+body.dark-mode .flex-1 {
+  background-color: #1f2937; /* Fond sombre pour les éléments de la liste */
+  color: #f3f4f6; /* Texte clair */
+}

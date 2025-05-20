@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import natural from "natural";
 import nodemailer from 'nodemailer';
+import cron from "node-cron";
 
 dotenv.config();
 const app = express();
@@ -27,8 +28,8 @@ const transporter = nodemailer.createTransport({
         user: 'chatbotstfelixlasalle@gmail.com',
         pass: process.env.EMAIL_PASS,
     },
-    logger: true, // Active les logs
-    debug: true,  // Active le mode débogage
+    logger: true,
+    debug: true,
 });
 
 db.connect((err) => {
@@ -57,7 +58,7 @@ app.get("/utilisateur", (req, res) => {
 
 app.get("/utilisateur/login", (req, res) => {
     const { email, password } = req.query;
-    const query = "SELECT id, nom, prenom, email, role FROM utilisateur WHERE email = ? AND password = ?";
+    const query = "SELECT id, nom, prenom, email, role, date_naissance FROM utilisateur WHERE email = ? AND password = ?";
     
     db.query(query, [email, password], (err, results) => {
         if (err) {
@@ -74,10 +75,10 @@ app.get("/utilisateur/login", (req, res) => {
 });
 
 app.post("/utilisateur", (req, res) => {
-    const { nom, prenom, email, password, role } = req.body;
-    const query = "INSERT INTO utilisateur (nom, prenom, email, password, role, confirmation, date_inscription) VALUES (?, ?, ?, ?, ?, FALSE, NOW())";
+    const { nom, prenom, email, password, role, date_naissance } = req.body;
+    const query = "INSERT INTO utilisateur (nom, prenom, email, password, role, confirmation, date_inscription, date_naissance) VALUES (?, ?, ?, ?, ?, FALSE, NOW(), ?)";
 
-    db.query(query, [nom, prenom, email, password, role], (err, result) => {
+    db.query(query, [nom, prenom, email, password, role, date_naissance], (err, result) => {
         if (err) {
             console.error("Erreur SQL:", err);
             res.status(500).send("Erreur serveur");
@@ -86,12 +87,11 @@ app.post("/utilisateur", (req, res) => {
 
         const confirmationLink = `http://localhost:5000/confirm/${result.insertId}`;
         const mailOptions = {
-            from: 'chatbotstfelixlasalle@gmail.com', // Adresse Gmail
-            to: email, // Adresse e-mail de l'utilisateur
+            from: 'chatbotstfelixlasalle@gmail.com',
+            to: email,
             subject: 'Confirmation de votre compte',
             text: `Bonjour ${prenom},\n\nCliquez sur ce lien pour confirmer votre compte : ${confirmationLink}\n\nMerci.`,
         };
-
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.error("Erreur lors de l'envoi de l'e-mail:", error);
@@ -120,7 +120,6 @@ app.get("/confirm/:id", (req, res) => {
 app.delete("/utilisateur/:id", (req, res) => {
     const { id } = req.params;
     const query = "DELETE FROM utilisateur WHERE id = ?";
-  
     db.query(query, [id], (err, result) => {
       if (err) {
         console.error("Erreur SQL lors de la suppression de l'utilisateur:", err);
@@ -133,10 +132,10 @@ app.delete("/utilisateur/:id", (req, res) => {
   
   app.put("/utilisateur/:id", (req, res) => {
     const { id } = req.params;
-    const { nom, prenom, email, role } = req.body;
-    const query = "UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ? WHERE id = ?";
+    const { nom, prenom, email, role, date_naissance } = req.body;
+    const query = "UPDATE utilisateur SET nom = ?, prenom = ?, email = ?, role = ?, date_naissance = ? WHERE id = ?";
   
-    db.query(query, [nom, prenom, email, role, id], (err, result) => {
+    db.query(query, [nom, prenom, email, role, date_naissance, id], (err, result) => {
       if (err) {
         console.error("Erreur SQL lors de la mise à jour de l'utilisateur:", err);
         res.status(500).send("Erreur serveur");
@@ -189,38 +188,69 @@ app.get("/question", (req, res) => {
 });
 
 // Supprimer une question et sa réponse associée
-app.delete("/question/:id", (req, res) => {
+app.delete("/logs_interaction/:id", (req, res) => {
     const { id } = req.params;
 
-    //Supprimer l'interaction associée
-    const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
-    db.query(deleteInteractionQuery, [id], (err) => {
-        if (err) {
-            console.error("Erreur SQL lors de la suppression de l'interaction:", err);
+    console.log(`🔍 Début de la suppression de la question avec ID: ${id}`);
+
+    db.beginTransaction((transactionErr) => {
+        if (transactionErr) {
+            console.error("❌ Erreur lors du démarrage de la transaction:", transactionErr);
             res.status(500).send("Erreur serveur");
             return;
         }
-    });
+        console.log("✅ Transaction démarrée avec succès.");
 
-    // Supprimer la réponse associée
-    const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
-    db.query(deleteResponseQuery, [id], (err) => {
-        if (err) {
-            console.error("Erreur SQL lors de la suppression de la réponse:", err);
-            res.status(500).send("Erreur serveur");
-            return;
-        }
-
-        // Supprimer la question
-        const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
-        db.query(deleteQuestionQuery, [id], (err) => {
+        // Supprimer l'interaction associée
+        const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
+        db.query(deleteInteractionQuery, [id], (err) => {
             if (err) {
-                console.error("Erreur SQL lors de la suppression de la question:", err);
-                res.status(500).send("Erreur serveur");
-                return;
+                console.error("❌ Erreur SQL lors de la suppression de l'interaction:", err);
+                return db.rollback(() => {
+                    console.log("🔄 Transaction annulée.");
+                    res.status(500).send("Erreur serveur");
+                });
             }
+            console.log("✅ Interactions associées supprimées avec succès.");
 
-            res.json({ message: "Question et réponse associée supprimées avec succès", id });
+            // Supprimer la réponse associée
+            const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
+            db.query(deleteResponseQuery, [id], (err) => {
+                if (err) {
+                    console.error("❌ Erreur SQL lors de la suppression de la réponse:", err);
+                    return db.rollback(() => {
+                        console.log("🔄 Transaction annulée.");
+                        res.status(500).send("Erreur serveur");
+                    });
+                }
+                console.log("✅ Réponses associées supprimées avec succès.");
+
+                // Supprimer la question
+                const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
+                db.query(deleteQuestionQuery, [id], (err) => {
+                    if (err) {
+                        console.error("❌ Erreur SQL lors de la suppression de la question:", err);
+                        return db.rollback(() => {
+                            console.log("🔄 Transaction annulée.");
+                            res.status(500).send("Erreur serveur");
+                        });
+                    }
+                    console.log("✅ Question supprimée avec succès.");
+
+                    // Valider la transaction
+                    db.commit((commitErr) => {
+                        if (commitErr) {
+                            console.error("❌ Erreur lors de la validation de la transaction:", commitErr);
+                            return db.rollback(() => {
+                                console.log("🔄 Transaction annulée.");
+                                res.status(500).send("Erreur serveur");
+                            });
+                        }
+                        console.log("✅ Transaction validée avec succès.");
+                        res.json({ message: "Question et historique associés supprimés avec succès", id });
+                    });
+                });
+            });
         });
     });
 });
@@ -251,8 +281,6 @@ app.post("/reponse", (req, res) => {
         res.json({ id: result.insertId, question_id, contenu, source });
     });
 });
-
-//
 
 // Fonction pour analyser la qualité d'un mot de passe
 function analyzePassword(password) {
@@ -303,7 +331,6 @@ function analyzePassword(password) {
 }
 
 // Route pour gérer les questions
-
 app.post("/question", async (req, res) => {
     const { utilisateur_id, contenu } = req.body;
 
@@ -631,6 +658,44 @@ app.put("/ticket/:id", (req, res) => {
       res.json({ message: "Statut du ticket mis à jour avec succès", id });
     });
   });
+
+
+// ------------------- CRON : Mail d'anniversaire -------------------
+cron.schedule('0 8 * * *', () => {
+  db.query("SELECT id, prenom, email, date_naissance FROM utilisateur", (err, users) => {
+    if (err) {
+      console.error("Erreur SQL:", err);
+      return;
+    }
+    const today = new Date();
+    const todayMonth = today.getMonth() + 1;
+    const todayDay = today.getDate();
+
+    users.forEach(user => {
+      if (user.date_naissance) {
+        const birthDate = new Date(user.date_naissance);
+        if (
+          birthDate.getMonth() + 1 === todayMonth &&
+          birthDate.getDate() === todayDay
+        ) {
+          const mailOptions = {
+            from: 'chatbotstfelixlasalle@gmail.com',
+            to: user.email,
+            subject: 'Joyeux anniversaire !',
+            text: `Bonjour ${user.prenom},\n\nToute l'équipe vous souhaite un très joyeux anniversaire ! 🎉\n\nPassez une excellente journée !\n\nL'équipe ChatBot St Félix La Salle`
+          };
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              console.error("Erreur lors de l'envoi de l'e-mail d'anniversaire:", error);
+            } else {
+              console.log(`E-mail d'anniversaire envoyé à ${user.email}`);
+            }
+          });
+        }
+      }
+    });
+  });
+});
 
 app.listen(PORT, () => {
     console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);

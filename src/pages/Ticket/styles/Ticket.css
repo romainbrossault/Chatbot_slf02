@@ -205,3 +205,48 @@
   .cancel-button:hover {
     background-color: #dc2626;
   }
+
+  /* Mode sombre pour la page Ticket */
+body.dark-mode .ticket-container {
+  background-color: #374151; /* Fond sombre */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .ticket-title {
+  color: #f3f4f6; /* Texte clair pour le titre */
+}
+
+body.dark-mode .ticket-form {
+  background-color: #374151; /* Fond sombre pour le formulaire */
+  border: 1px solid #4b5563; /* Bordure sombre */
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea,
+body.dark-mode .form-group select {
+  background-color: #4b5563; /* Fond sombre */
+  color: #f3f4f6; /* Texte clair */
+  border: 1px solid #6b7280; /* Bordure sombre */
+}
+
+body.dark-mode .submit-button {
+  background-color: #6b7280; /* Bouton gris */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .submit-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}
+
+body.dark-mode .create-ticket-button {
+  background-color: #6b7280; /* Bouton gris */
+  color: #f3f4f6; /* Texte clair */
+}
+
+body.dark-mode .create-ticket-button:hover {
+  background-color: #4b5563; /* Couleur au survol */
+}
+
+body.dark-mode .ticket-item {
+  color: black;
+}

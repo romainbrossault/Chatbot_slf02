@@ -1,41 +1,42 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock } from 'lucide-react';
+import { User, Mail, Lock, Calendar } from 'lucide-react';
 import './styles/Register.css';
 import { UserContext } from '../../context/UserContext';
 
 const Register: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState(''); // Nouvel état pour la date de naissance
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('élève');
-  const [acceptRGPD, setAcceptRGPD] = useState(false); // État pour la case RGPD
+  const [acceptRGPD, setAcceptRGPD] = useState(false);
   const navigate = useNavigate();
   const { login } = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (password !== confirmPassword) {
       console.error('Passwords do not match');
       return;
     }
-  
+
     if (!acceptRGPD) {
       console.error('Vous devez accepter les conditions RGPD.');
       return;
     }
-  
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const domain = '@stfelixlasalle.fr';
-  
+
     if (!emailRegex.test(email) || !email.endsWith(domain)) {
       console.error(`L'adresse e-mail doit être valide et se terminer par ${domain}`);
       return;
     }
-  
+
     try {
       const response = await fetch('http://localhost:5000/utilisateur', {
         method: 'POST',
@@ -45,12 +46,13 @@ const Register: React.FC = () => {
         body: JSON.stringify({
           nom: lastName,
           prenom: firstName,
+          date_naissance: birthDate, // Ajout de la date de naissance
           email,
           password,
           role,
         }),
       });
-  
+
       if (response.ok) {
         console.log('Un e-mail de confirmation a été envoyé.');
         navigate('/confirmation-pending');
@@ -105,6 +107,20 @@ const Register: React.FC = () => {
                 placeholder="Nom"
               />
             </div>
+          </div>
+          <div className="input-wrapper">
+            <div className="input-icon">
+            </div>
+            <input
+              id="birth-date"
+              name="birthDate"
+              type="date"
+              required
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              className="form-input form-input-with-icon"
+              placeholder="Date de naissance"
+            />
           </div>
           <div className="input-wrapper">
             <div className="input-icon">
