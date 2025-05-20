@@ -483,6 +483,7 @@ body.dark-mode .message.ai-message {
   background-color: #e53935;
 }
 
+<<<<<<< Updated upstream:src/pages/Home/styles/Home.css
 .suggestions-container {
   margin-top: 0.5rem;
   width: 100%;
@@ -561,3 +562,5 @@ body.dark-mode .message.ai-message {
   background-color: #1d4ed8;
 }
 
+=======
+>>>>>>> Stashed changes:src/styles/Home.css
