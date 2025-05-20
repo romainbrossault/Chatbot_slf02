@@ -42,7 +42,7 @@ const Chats: React.FC = () => {
     fetchChatLogs();
   }, [user, navigate]);
 
-  // Fonction pour supprimer une question et sa réponse
+  // Fonction pour supprimer une question et sa réponse 
   const handleDelete = async (id: number) => {
     try {
         const response = await fetch(`http://localhost:5000/logs_interaction/${id}`, {
