@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import moonIcon from '../../img/moon.png'; // Icône pour le mode clair
+import sunIcon from '../../img/sun.png'; // Icône pour le mode sombre
+import './styles/Theme.css';
 
 const Theme: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -18,10 +21,15 @@ const Theme: React.FC = () => {
 
   return (
     <button
-      className={`theme-toggle-button ${isDarkMode ? 'dark-mode' : ''}`}
+      className="theme-toggle-button"
       onClick={toggleTheme}
+      aria-label="Toggle Theme"
     >
-      {isDarkMode ? 'Mode Clair' : 'Mode Sombre'}
+      <img
+        src={isDarkMode ? moonIcon : sunIcon }
+        alt={isDarkMode ? 'Light Mode' : 'Dark Mode'}
+        className="theme-icon"
+      />
     </button>
   );
 };

@@ -62,3 +62,24 @@ body.dark-mode .dropdown-button {
 body.dark-mode .dropdown-button:hover {
   background-color: #4b5563; /* Couleur au survol */
 }
+
+.theme-toggle-button {
+  padding: 0.5rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
