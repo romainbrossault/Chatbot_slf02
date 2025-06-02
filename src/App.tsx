@@ -12,6 +12,7 @@ import Account from './pages/Account/Account';
 import ManageTheme from './pages/ManageTheme/ManageTheme';
 import AdminKnowledge from './pages/AdminKnowLedge/AdminKnowLedge';
 import Ticket from './pages/Ticket/Ticket';
+import QuestionsNonComprises from "./pages/QuestionsNonComprises/QuestionsNonComprises";
 import ManageTickets from './pages/ManageTickets/ManageTickets'; 
 import ManageUsers from './pages/ManageUsers/ManageUsers'; 
 import { UserProvider } from './context/UserContext';
@@ -37,6 +38,7 @@ function App() {
               <Route path="/ticket" element={<Ticket />} />
               <Route path="/manage-tickets" element={<ManageTickets />} /> 
               <Route path="/manage-users" element={<ManageUsers />} />
+              <Route path="/questions-non-comprises" element={<QuestionsNonComprises />} />
             </Routes>
           </div>
         </div>

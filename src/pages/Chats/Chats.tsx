@@ -58,7 +58,7 @@ const Chats: React.FC = () => {
     } catch (error) {
         console.error("Erreur réseau lors de la suppression de la question:", error);
     }
-};
+  };
 
   // Filtrer les logs en fonction du terme de recherche
   const filteredLogs = chatLogs.filter((log) =>

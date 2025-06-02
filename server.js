@@ -187,11 +187,11 @@ app.get("/question", (req, res) => {
     });
 });
 
-// Supprimer une question et sa réponse associée
+// Supprimer une question et sa réponse associée à partir de l'ID du log d'interaction
 app.delete("/logs_interaction/:id", (req, res) => {
     const { id } = req.params;
 
-    console.log(`🔍 Début de la suppression de la question avec ID: ${id}`);
+    console.log(`🔍 Début de la suppression du log d'interaction avec ID: ${id}`);
 
     db.beginTransaction((transactionErr) => {
         if (transactionErr) {
@@ -201,53 +201,45 @@ app.delete("/logs_interaction/:id", (req, res) => {
         }
         console.log("✅ Transaction démarrée avec succès.");
 
-        // Supprimer l'interaction associée
-        const deleteInteractionQuery = "DELETE FROM logs_interaction WHERE question_bis_id = ?";
-        db.query(deleteInteractionQuery, [id], (err) => {
-            if (err) {
-                console.error("❌ Erreur SQL lors de la suppression de l'interaction:", err);
-                return db.rollback(() => {
-                    console.log("🔄 Transaction annulée.");
-                    res.status(500).send("Erreur serveur");
-                });
+        // 1. Récupérer l'ID de la question associée à ce log
+        db.query("SELECT question_bis_id FROM logs_interaction WHERE id = ?", [id], (err, results) => {
+            if (err || results.length === 0) {
+                console.error("❌ Erreur lors de la récupération de la question associée:", err);
+                return db.rollback(() => res.status(500).send("Erreur serveur"));
             }
-            console.log("✅ Interactions associées supprimées avec succès.");
+            const questionId = results[0].question_bis_id;
 
-            // Supprimer la réponse associée
-            const deleteResponseQuery = "DELETE FROM reponse WHERE question_id = ?";
-            db.query(deleteResponseQuery, [id], (err) => {
+            // 2. Supprimer le log d'interaction
+            db.query("DELETE FROM logs_interaction WHERE id = ?", [id], (err) => {
                 if (err) {
-                    console.error("❌ Erreur SQL lors de la suppression de la réponse:", err);
-                    return db.rollback(() => {
-                        console.log("🔄 Transaction annulée.");
-                        res.status(500).send("Erreur serveur");
-                    });
+                    console.error("❌ Erreur lors de la suppression du log d'interaction:", err);
+                    return db.rollback(() => res.status(500).send("Erreur serveur"));
                 }
-                console.log("✅ Réponses associées supprimées avec succès.");
+                console.log("✅ Log d'interaction supprimé.");
 
-                // Supprimer la question
-                const deleteQuestionQuery = "DELETE FROM question WHERE id = ?";
-                db.query(deleteQuestionQuery, [id], (err) => {
+                // 3. Supprimer la réponse associée à la question
+                db.query("DELETE FROM reponse WHERE question_id = ?", [questionId], (err) => {
                     if (err) {
-                        console.error("❌ Erreur SQL lors de la suppression de la question:", err);
-                        return db.rollback(() => {
-                            console.log("🔄 Transaction annulée.");
-                            res.status(500).send("Erreur serveur");
-                        });
+                        console.error("❌ Erreur lors de la suppression de la réponse:", err);
+                        return db.rollback(() => res.status(500).send("Erreur serveur"));
                     }
-                    console.log("✅ Question supprimée avec succès.");
+                    console.log("✅ Réponse associée supprimée.");
 
-                    // Valider la transaction
-                    db.commit((commitErr) => {
-                        if (commitErr) {
-                            console.error("❌ Erreur lors de la validation de la transaction:", commitErr);
-                            return db.rollback(() => {
-                                console.log("🔄 Transaction annulée.");
-                                res.status(500).send("Erreur serveur");
-                            });
+                    // 4. Supprimer la question elle-même
+                    db.query("DELETE FROM question WHERE id = ?", [questionId], (err) => {
+                        if (err) {
+                            console.error("❌ Erreur lors de la suppression de la question:", err);
+                            return db.rollback(() => res.status(500).send("Erreur serveur"));
                         }
-                        console.log("✅ Transaction validée avec succès.");
-                        res.json({ message: "Question et historique associés supprimés avec succès", id });
+                        console.log("✅ Question supprimée.");
+
+                        db.commit((commitErr) => {
+                            if (commitErr) {
+                                return db.rollback(() => res.status(500).send("Erreur serveur"));
+                            }
+                            console.log("✅ Transaction validée avec succès.");
+                            res.json({ message: "Question, réponse et log supprimés avec succès", log_id: id, question_id: questionId });
+                        });
                     });
                 });
             });
@@ -330,6 +322,30 @@ function analyzePassword(password) {
     };
 }
 
+app.get("/question_non_comprise", (req, res) => {
+    db.query("SELECT * FROM question_non_comprise", (err, results) => {
+        if (err) {
+            console.error("Erreur SQL lors de la récupération des questions non comprises:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json(results);
+    });
+});
+
+// Marquer une question non comprise comme traitée
+app.put("/question_non_comprise/:id", (req, res) => {
+    const { id } = req.params;
+    db.query("UPDATE question_non_comprise SET statut = 1 WHERE id = ?", [id], (err, result) => {
+        if (err) {
+            console.error("Erreur SQL lors de la mise à jour du statut:", err);
+            res.status(500).send("Erreur serveur");
+            return;
+        }
+        res.json({ message: "Question marquée comme traitée", id });
+    });
+});
+
 // Route pour gérer les questions
 app.post("/question", async (req, res) => {
     const { utilisateur_id, contenu } = req.body;
@@ -380,6 +396,16 @@ app.post("/question", async (req, res) => {
         });
 
         if (!bestTheme) {
+            // Insérer dans question_non_comprise sans question_id
+            db.query(
+                "INSERT INTO question_non_comprise (contenu_question, statut) VALUES (?, 0)",
+                [contenu],
+                (err) => {
+                    if (err) {
+                        console.error("Erreur SQL lors de l'insertion dans question_non_comprise:", err);
+                    }
+                }
+            );
             return res.json({
                 id: null,
                 utilisateur_id,
@@ -451,11 +477,30 @@ app.post("/question", async (req, res) => {
             date_question: new Date(),
             reponse: responseContent.trim(),
             reponse_id: reponseId,
+            theme_id: bestTheme.id 
         });
     } catch (error) {
         console.error("Erreur lors du traitement de la question:", error);
         res.status(500).send("Erreur serveur");
     }
+});
+
+app.get("/suggestions", (req, res) => {
+    const { theme_id, limit = 5 } = req.query;
+    if (!theme_id) {
+        return res.status(400).json({ error: "theme_id requis" });
+    }
+    db.query(
+        "SELECT id, contenu FROM base_connaissance WHERE theme_id = ? LIMIT ?",
+        [theme_id, Number(limit)],
+        (err, results) => {
+            if (err) {
+                console.error("Erreur SQL lors de la récupération des suggestions:", err);
+                return res.status(500).send("Erreur serveur");
+            }
+            res.json(results.map(r => ({ id: r.id, suggestion: r.contenu })));
+        }
+    );
 });
 
 // Récupérer l'historique des interactions
@@ -536,25 +581,69 @@ app.put("/theme/:id", (req, res) => {
 
 app.delete("/theme/:id", (req, res) => {
   const { id } = req.params;
-  console.log(`🔍 Tentative de suppression du thème avec ID: ${id}`); // Log pour vérifier l'ID
+  console.log(`🔍 Tentative de suppression du thème avec ID: ${id}`);
 
-  const query = "DELETE FROM theme WHERE id = ?";
-
-  db.query(query, [id], (err, result) => {
-    if (err) {
-      console.error("❌ Erreur SQL lors de la suppression du thème:", err); // Log de l'erreur SQL
-      res.status(500).send("Erreur serveur");
-      return;
+  db.beginTransaction(async (transactionErr) => {
+    if (transactionErr) {
+      console.error("❌ Erreur lors du démarrage de la transaction:", transactionErr);
+      return res.status(500).send("Erreur serveur");
     }
 
-    if (result.affectedRows === 0) {
-      console.warn("⚠️ Aucun thème trouvé avec cet ID."); // Log si aucun thème n'est trouvé
-      res.status(404).send("Thème non trouvé");
-      return;
-    }
+    // 1. Récupérer tous les contenus liés à ce thème
+    db.query("SELECT id FROM base_connaissance WHERE theme_id = ?", [id], (err, connaissances) => {
+      if (err) {
+        console.error("❌ Erreur lors de la récupération des contenus:", err);
+        return db.rollback(() => res.status(500).send("Erreur serveur"));
+      }
 
-    console.log("✅ Thème supprimé avec succès."); // Log de succès
-    res.json({ message: "Thème supprimé avec succès", id });
+      const connaissanceIds = connaissances.map(c => c.id);
+      if (connaissanceIds.length > 0) {
+        // 2. Supprimer les logs_interaction liés à ces contenus
+        db.query("DELETE FROM logs_interaction WHERE connaissance_bis_id IN (?)", [connaissanceIds], (err) => {
+          if (err) {
+            console.error("❌ Erreur lors de la suppression des logs_interaction:", err);
+            return db.rollback(() => res.status(500).send("Erreur serveur"));
+          }
+
+          // 3. Supprimer les contenus de base_connaissance
+          db.query("DELETE FROM base_connaissance WHERE id IN (?)", [connaissanceIds], (err) => {
+            if (err) {
+              console.error("❌ Erreur lors de la suppression des contenus:", err);
+              return db.rollback(() => res.status(500).send("Erreur serveur"));
+            }
+            // 4. Supprimer le thème
+            db.query("DELETE FROM theme WHERE id = ?", [id], (err, result) => {
+              if (err) {
+                console.error("❌ Erreur SQL lors de la suppression du thème:", err);
+                return db.rollback(() => res.status(500).send("Erreur serveur"));
+              }
+              db.commit((commitErr) => {
+                if (commitErr) {
+                  return db.rollback(() => res.status(500).send("Erreur serveur"));
+                }
+                console.log("✅ Thème supprimé avec succès.");
+                res.json({ message: "Thème supprimé avec succès", id });
+              });
+            });
+          });
+        });
+      } else {
+        // Si aucun contenu, supprimer directement le thème
+        db.query("DELETE FROM theme WHERE id = ?", [id], (err, result) => {
+          if (err) {
+            console.error("❌ Erreur SQL lors de la suppression du thème:", err);
+            return db.rollback(() => res.status(500).send("Erreur serveur"));
+          }
+          db.commit((commitErr) => {
+            if (commitErr) {
+              return db.rollback(() => res.status(500).send("Erreur serveur"));
+            }
+            console.log("✅ Thème supprimé avec succès.");
+            res.json({ message: "Thème supprimé avec succès", id });
+          });
+        });
+      }
+    });
   });
 });
 
