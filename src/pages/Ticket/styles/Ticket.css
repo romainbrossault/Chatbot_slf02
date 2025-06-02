@@ -250,3 +250,15 @@ body.dark-mode .create-ticket-button:hover {
 body.dark-mode .ticket-item {
   color: black;
 }
+
+/* Mode sombre : bouton de suppression de ticket en rouge */
+body.dark-mode .delete-button {
+  background-color: #ef4444;
+  color: #f3f4f6;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+body.dark-mode .delete-button:hover {
+  background-color: #dc2626;
+}

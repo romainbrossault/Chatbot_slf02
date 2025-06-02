@@ -106,3 +106,49 @@
   .edit-user-form button:last-child:hover {
     background-color: #dc2626;
   }
+
+  /* ...existing code... */
+
+body.dark-mode .manage-users-container {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+body.dark-mode .user-item {
+  background-color: #374151;
+  color: #f3f4f6;
+  border: 1px solid #4b5563;
+}
+
+body.dark-mode .user-item button {
+  background-color: #6b7280;
+  color: #f3f4f6;
+}
+
+body.dark-mode .user-item button:hover {
+  background-color: #4b5563;
+}
+
+body.dark-mode .edit-user-form input,
+body.dark-mode .edit-user-form select {
+  background-color: #4b5563;
+  color: #f3f4f6;
+  border: 1px solid #6b7280;
+}
+
+body.dark-mode .edit-user-form button {
+  background-color: #16a34a;
+  color: #f3f4f6;
+}
+
+body.dark-mode .edit-user-form button:hover {
+  background-color: #15803d;
+}
+
+body.dark-mode .edit-user-form button:last-child {
+  background-color: #ef4444;
+}
+
+body.dark-mode .edit-user-form button:last-child:hover {
+  background-color: #dc2626;
+}

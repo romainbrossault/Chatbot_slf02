@@ -90,6 +90,9 @@ const ManageTheme: React.FC = () => {
     try {
       const response = await fetch(`http://localhost:5000/theme/${themeId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -97,9 +100,12 @@ const ManageTheme: React.FC = () => {
         setThemes((prevThemes) => prevThemes.filter((theme) => theme.id !== themeId));
         setDeletePopupMessage('Thème supprimé avec succès.');
       } else {
+        const errorData = await response.json();
+        console.error('Erreur lors de la suppression du thème:', errorData);
         setDeletePopupMessage('Erreur lors de la suppression du thème.');
       }
     } catch (err) {
+      console.error('Erreur réseau lors de la suppression du thème:', err);
       setDeletePopupMessage('Erreur réseau. Veuillez réessayer.');
     }
   };
@@ -166,7 +172,6 @@ const ManageTheme: React.FC = () => {
         </div>
       )}
 
-      {/* Pop-up modale */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">

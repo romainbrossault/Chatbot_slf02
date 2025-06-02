@@ -161,3 +161,8 @@ body.dark-mode .flex-1 {
   background-color: #1f2937; /* Fond sombre pour les éléments de la liste */
   color: #f3f4f6; /* Texte clair */
 }
+
+body.dark-mode .chat-question,
+body.dark-mode .chat-response {
+  color : white;
+}

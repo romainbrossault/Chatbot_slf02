@@ -78,3 +78,37 @@ body {
   color: #6b7280;
   margin-top: 1rem;
 }
+
+/* Mode sombre pour la page UserGuide */
+body.dark-mode .guide-container {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+body.dark-mode .guide-title {
+  color: #f3f4f6;
+}
+
+body.dark-mode .guide-section {
+  background-color: #374151;
+  color: #f3f4f6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .section-title {
+  color: #f3f4f6;
+}
+
+body.dark-mode .section-icon {
+  color: #60a5fa;
+}
+
+body.dark-mode .guide-list,
+body.dark-mode .ordered-list,
+body.dark-mode .unordered-list {
+  color: #f3f4f6;
+}
+
+body.dark-mode .admin-note {
+  color: #9ca3af;
+}

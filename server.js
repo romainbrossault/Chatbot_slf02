@@ -533,18 +533,29 @@ app.put("/theme/:id", (req, res) => {
     });
 });
 
-app.delete("/theme/:id", (req, res) => {
-    const { id } = req.params;
-    const query = "DELETE FROM theme WHERE id = ?";
 
-    db.query(query, [id], (err, result) => {
-        if (err) {
-            console.error("Erreur SQL lors de la suppression du thème:", err);
-            res.status(500).send("Erreur serveur");
-            return;
-        }
-        res.json({ message: "Thème supprimé avec succès", id });
-    });
+app.delete("/theme/:id", (req, res) => {
+  const { id } = req.params;
+  console.log(`🔍 Tentative de suppression du thème avec ID: ${id}`); // Log pour vérifier l'ID
+
+  const query = "DELETE FROM theme WHERE id = ?";
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error("❌ Erreur SQL lors de la suppression du thème:", err); // Log de l'erreur SQL
+      res.status(500).send("Erreur serveur");
+      return;
+    }
+
+    if (result.affectedRows === 0) {
+      console.warn("⚠️ Aucun thème trouvé avec cet ID."); // Log si aucun thème n'est trouvé
+      res.status(404).send("Thème non trouvé");
+      return;
+    }
+
+    console.log("✅ Thème supprimé avec succès."); // Log de succès
+    res.json({ message: "Thème supprimé avec succès", id });
+  });
 });
 
 // Gestion des contenus

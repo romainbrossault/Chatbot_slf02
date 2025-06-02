@@ -180,3 +180,56 @@ body {
 .signup-link:hover {
   color: #1d4ed8;
 }
+
+/* Mode sombre pour la page Login */
+body.dark-mode .login-container {
+  background: #1f2937;
+}
+
+body.dark-mode .login-container::before {
+  content: none; /* Supprime le gradient animé */
+}
+
+body.dark-mode .login-form-container {
+  background-color: #374151;
+  color: #f3f4f6;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+}
+
+body.dark-mode .login-title {
+  color: #f3f4f6;
+}
+
+body.dark-mode .form-input {
+  background-color: #4b5563;
+  color: #f3f4f6;
+  border: 1px solid #6b7280;
+}
+
+body.dark-mode .form-input::placeholder {
+  color: #9ca3af;
+}
+
+body.dark-mode .login-button {
+  background-color: #6b7280;
+  color: #f3f4f6;
+}
+
+body.dark-mode .login-button:hover {
+  background-color: #4b5563;
+}
+
+body.dark-mode .remember-label,
+body.dark-mode .signup-text {
+  color: #f3f4f6;
+}
+
+body.dark-mode .forgot-password,
+body.dark-mode .signup-link {
+  color: #60a5fa;
+}
+
+body.dark-mode .forgot-password:hover,
+body.dark-mode .signup-link:hover {
+  color: #3b82f6;
+}

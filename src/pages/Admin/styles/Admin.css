@@ -65,3 +65,11 @@ body.dark-mode .admin-button {
 body.dark-mode .admin-button:hover {
   background-color: #4b5563; /* Couleur au survol */
 }
+
+/* ...existing code... */
+
+/* Mode sombre pour la page Admin */
+body.dark-mode .admin-container {
+  background: #1f2937; /* Fond sombre statique identique à la page Home */
+  color: #f3f4f6; /* Texte clair */
+}
