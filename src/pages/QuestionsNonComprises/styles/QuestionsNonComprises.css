@@ -1,0 +1,42 @@
+.questions-non-comprises-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.statut-non-traite {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.statut-traite {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.traiter-btn {
+  background: #187bcd;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.traiter-btn:hover {
+  background: #1d4ed8;
+}

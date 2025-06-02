@@ -17,6 +17,7 @@ const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const chatAreaRef = useRef<HTMLDivElement>(null);
@@ -90,7 +91,16 @@ const Home: React.FC = () => {
         };
         setMessages((prev) => [...prev, aiMessage]);
 
-        if (!conversationId) {
+        // Suggestions de questions si un thème est identifié
+        if (data.theme_id) {
+          fetch(`http://localhost:5000/suggestions?theme_id=${data.theme_id}`)
+            .then(res => res.json())
+            .then(suggestionsData => setSuggestions(suggestionsData));
+        } else {
+          setSuggestions([]);
+        }
+
+        if (!conversationId && data.conversation_id) {
           setConversationId(data.conversation_id);
         }
       } else {
@@ -100,6 +110,7 @@ const Home: React.FC = () => {
           isUser: false,
         };
         setMessages((prev) => [...prev, aiMessage]);
+        setSuggestions([]);
       }
     } catch (error) {
       const aiMessage: Message = {
@@ -108,6 +119,7 @@ const Home: React.FC = () => {
         isUser: false,
       };
       setMessages((prev) => [...prev, aiMessage]);
+      setSuggestions([]);
     }
   };
 
@@ -157,6 +169,16 @@ const Home: React.FC = () => {
                 )}
               </div>
             ))}
+            {suggestions.length > 0 && (
+              <div className="suggestions-list">
+                <h3>Autres réponses pour ce thème :</h3>
+                <ul>
+                  {suggestions.map((s: any) => (
+                    <li key={s.id} className="suggestion-item">{s.suggestion}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -192,6 +214,7 @@ const Home: React.FC = () => {
       {showPasswordPopup && (
         <div className="popup">
           <div className="popup-content">
+            <h2>Mot de passe</h2>
             <button onClick={() => { setIsPasswordTest(true); setShowPasswordPopup(false); }}>Tester MDP</button>
             <button onClick={handleGeneratePassword}>Générer MDP</button>
             <button onClick={() => setShowPasswordPopup(false)}>Fermer</button>

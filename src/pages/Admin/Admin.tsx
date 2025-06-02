@@ -60,6 +60,14 @@ const Admin: React.FC = () => {
         >
           Gestion Utilisateur
         </motion.button>
+        <motion.button
+          className="admin-button"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/questions-non-comprises')}
+        >
+          Questions non comprises
+        </motion.button>
       </motion.div>
     </motion.div>
   );
